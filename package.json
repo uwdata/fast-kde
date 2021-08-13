@@ -1,0 +1,27 @@
+{
+  "name": "fast-kde",
+  "version": "1.0.0",
+  "keywords": [
+    "kernel density estimation",
+    "kde",
+    "deriche",
+    "box filter"
+  ],
+  "license": "BSD-3-Clause",
+  "author": "Jeffrey Heer (http://idl.cs.washington.edu)",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uwdata/fast-kde.git"
+  },
+  "scripts": {
+    "benchmarks": "node ./bin/run-benchmarks",
+    "lint": "eslint src --ext .js"
+  },
+  "dependencies": {
+    "arquero": "^4.7.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.25.0"
+  }
+}
