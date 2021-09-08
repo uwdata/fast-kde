@@ -19,9 +19,9 @@
     "lint": "eslint src --ext .js"
   },
   "dependencies": {
-    "arquero": "^4.7.2"
+    "arquero": "^4.8.4"
   },
   "devDependencies": {
-    "eslint": "^7.25.0"
+    "eslint": "^7.32.0"
   }
 }
