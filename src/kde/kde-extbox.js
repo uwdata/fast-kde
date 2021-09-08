@@ -105,7 +105,7 @@ function kdeExtBox2d(data, domains, steps, bandwidths, grid2d) {
   const v = new Float64Array(xn * yn);
   for (let row = 0; row < yn; ++row) {
     const d0 = (oy + row) * nx + ox;
-    v.set(dest.subarray(d0, d0 + xn), row * xn);
+    v.set(grid.subarray(d0, d0 + xn), row * xn);
   }
   return v;
 }
