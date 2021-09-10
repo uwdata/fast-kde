@@ -2,7 +2,7 @@
 
 Methods and benchmarks for fast, approximate Gaussian kernel density estimation.
 
-This repo contains code (`src/`) and benchmark (`benchmarks/`) scripts for the VIS 2021 Short Paper "Fast & Accurate Gaussian Kernel Density Estimation". All code is written as ESM modules and require node.js version 12 or higher.
+This repo contains code (`src/`) and benchmark (`benchmarks/`) scripts for the VIS 2021 Short Paper "Fast & Accurate Gaussian Kernel Density Estimation". All code is written as ESM modules. Running benchmarks requires node.js version 13.2 or higher.
 
 ## Build Instructions
 
