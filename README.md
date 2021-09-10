@@ -28,7 +28,8 @@ Benchmark result datasets will be written to the `results` directory as JSON fil
 Convenience methods for performing 1D or 2D density estimation.
 
 <hr/><a id="density1d" href="#density1d">#</a>
-<em>kde</em>.<b>density1d</b>() · [Source](https://github.com/uwdata/fast-kde/blob/master/src/density1d.js)
+<i>kde</i>.<b>density1d</b>() ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/density1d.js)
 
 Creates a new 1D density estimate helper with default settings.
 
@@ -86,7 +87,8 @@ Get or set the density estimation *method* to use. One of [kdeDeriche1d](#kdeDer
 
 
 <hr/><a id="density2d" href="#density2d">#</a>
-<em>kde</em>.<b>density2d</b>() · [Source](https://github.com/uwdata/fast-kde/blob/master/src/density2d.js)
+<i>kde</i>.<b>density2d</b>() ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/density2d.js)
 
 Creates a new 2D density estimate helper with default settings.
 
@@ -151,72 +153,84 @@ Get or set the density estimation *method* to use. One of [kdeDeriche2d](#kdeDer
 ### 1D Density Estimation Methods
 
 <hr/><a id="kdeCDF1d" href="#kdeCDF1d">#</a>
-<em>kde</em>.<b>kdeCDF1d</b>(data, domain, steps, bandwidth) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-cdf.js)
+<i>kde</i>.<b>kdeCDF1d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-cdf.js)
 
-Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values via direct calculation of the Gaussian cumulative distribution function. This method can be very slow in practice and is provided only for comparison and testing purposes; see [kdeDeriche1d](#kdeDeriche1d) instead. The *domain* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *steps* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. Returns a Float64Array of size *steps* of gridded density estimates.
+Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values via direct calculation of the Gaussian cumulative distribution function. This method can be very slow in practice and is provided only for comparison and testing purposes; see [kdeDeriche1d](#kdeDeriche1d) instead. The *extent* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *size* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. Returns a Float64Array of gridded density estimates.
 
 <hr/><a id="kdeBox1d" href="#kdeBox1d">#</a>
-<em>kde</em>.<b>kdeBox1d</b>(data, domain, steps, bandwidth, grid1d) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-box.js)
+<i>kde</i>.<b>kdeBox1d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>, <i>grid1d</i>) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-box.js)
 
-Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values using the standard box filtering method. This method is not recommended for normal use, see [kdeDeriche1d](#kdeDeriche1d) instead. The *domain* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *steps* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. The *grid1d* parameter indicates the binning method to use, such as [grid1d_linear](#grid1d_linear) or [grid1d_simple](#grid1d_simple). Returns a Float64Array of size *steps* of gridded density estimates.
+Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values using the standard box filtering method. This method is not recommended for normal use, see [kdeDeriche1d](#kdeDeriche1d) instead. The *extent* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *size* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. The *grid1d* parameter indicates the binning method to use, such as [grid1d_linear](#grid1d_linear) or [grid1d_simple](#grid1d_simple). Returns a Float64Array of gridded density estimates.
 
 <hr/><a id="kdeExtBox1d" href="#kdeExtBox1d">#</a>
-<em>kde</em>.<b>kdeExtBox1d</b>(data, domain, steps, bandwidth, grid1d) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-extbox.js)
+<i>kde</i>.<b>kdeExtBox1d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>, <i>grid1d</i>) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-extbox.js)
 
-Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values using the extended box filtering method, which smooths away the quantization error of standard box filtering. This method is not recommended for normal use, see [kdeDeriche1d](#kdeDeriche1d) instead. The *domain* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *steps* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. The *grid1d* parameter indicates the binning method to use, such as [grid1d_linear](#grid1d_linear) or [grid1d_simple](#grid1d_simple). Returns a Float64Array of size *steps* of gridded density estimates.
+Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values using the extended box filtering method, which smooths away the quantization error of standard box filtering. This method is not recommended for normal use, see [kdeDeriche1d](#kdeDeriche1d) instead. The *extent* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *size* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. The *grid1d* parameter indicates the binning method to use, such as [grid1d_linear](#grid1d_linear) or [grid1d_simple](#grid1d_simple). Returns a Float64Array of gridded density estimates.
 
 <hr/><a id="kdeDeriche1D" href="#kdeDeriche1D">#</a>
-<em>kde</em>.<b>kdeDeriche1D</b>(data, domain, steps, bandwidth, grid1d) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-deriche.js)
+<i>kde</i>.<b>kdeDeriche1D</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>, <i>grid1d</i>) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-deriche.js)
 
-Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values using Deriche's recursive filter approximation. This method is recommended for normal use. The *domain* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *steps* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. The *grid1d* parameter indicates the binning method to use, such as [grid1d_linear](#grid1d_linear) or [grid1d_simple](#grid1d_simple). Returns a Float64Array of size *steps* of gridded density estimates.
+Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values using Deriche's recursive filter approximation. This method is recommended for normal use. The *extent* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *size* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. The *grid1d* parameter indicates the binning method to use, such as [grid1d_linear](#grid1d_linear) or [grid1d_simple](#grid1d_simple). Returns a Float64Array of gridded density estimates.
 
 ### 2D Density Estimation Methods
 
 <hr/><a id="kdeCDF2d" href="#kdeCDF2d">#</a>
-<em>kde</em>.<b>kdeCDF2d</b>(data, domains, bins, bandwidths) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-cdf.js)
+<i>kde</i>.<b>kdeCDF2d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidths</i>) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-cdf.js)
 
-Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values via direct calculation of the Gaussian cumulative distribution function. This method can be very slow in practice and is provided only for comparison and testing purposes; see [kdeDeriche2d](#kdeDeriche2d) instead. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *domains* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *bins* parameter should be a [binsX, binsY] array indicating the grid dimensions. The *bandwidths* parameters should be a [bandwidthX, bandwidthY] array. Returns a Float64Array of size *steps* of gridded density estimates.
+Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values via direct calculation of the Gaussian cumulative distribution function. This method can be very slow in practice and is provided only for comparison and testing purposes; see [kdeDeriche2d](#kdeDeriche2d) instead. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *extent* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *size* parameter should be a [sizeX, sizeY] array indicating the grid dimensions. The *bandwidths* parameters should be a [bandwidthX, bandwidthY] array. Returns a Float64Array of gridded density estimates.
 
 <hr/><a id="kdeBox2d" href="#kdeBox2d">#</a>
-<em>kde</em>.<b>kdeBox2d</b>(data, domains, bins, bandwidths, grid2d) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-box.js)
+<i>kde</i>.<b>kdeBox2d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidths</i>, <i>grid2d</i>) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-box.js)
 
-Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values using the standard box filtering method. This method is not recommended for normal use, see [kdeDeriche2d](#kdeDeriche2d) instead. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *domains* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *bins* parameter should be a [binsX, binsY] array indicating the grid dimensions. The *bandwidths* parameters should be a [bandwidthX, bandwidthY] array. The *grid2d* parameter indicates the binning method to use, such as [grid2d_linear](#grid2d_linear) or [grid2d_simple](#grid2d_simple). Returns a Float64Array of size *steps* of gridded density estimates.
+Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values using the standard box filtering method. This method is not recommended for normal use, see [kdeDeriche2d](#kdeDeriche2d) instead. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *extent* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *size* parameter should be a [sizeX, sizeY] array indicating the grid dimensions. The *bandwidths* parameters should be a [bandwidthX, bandwidthY] array. The *grid2d* parameter indicates the binning method to use, such as [grid2d_linear](#grid2d_linear) or [grid2d_simple](#grid2d_simple). Returns a Float64Array of gridded density estimates.
 
 <hr/><a id="kdeExtBox2d" href="#kdeExtBox2d">#</a>
-<em>kde</em>.<b>kdeExtBox2d</b>(data, domains, bins, bandwidths, grid2d) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-extbox.js)
+<i>kde</i>.<b>kdeExtBox2d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidths</i>, <i>grid2d</i>) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-extbox.js)
 
-Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values using the extended box filtering method, which smooths away the quantization error of standard box filtering. This method is not recommended for normal use, see [kdeDeriche2d](#kdeDeriche2d) instead. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *domains* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *bins* parameter should be a [binsX, binsY] array indicating the grid dimensions. The *bandwidths* parameters should be a [bandwidthX, bandwidthY] array. The *grid2d* parameter indicates the binning method to use, such as [grid2d_linear](#grid2d_linear) or [grid2d_simple](#grid2d_simple). Returns a Float64Array of size *steps* of gridded density estimates.
+Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values using the extended box filtering method, which smooths away the quantization error of standard box filtering. This method is not recommended for normal use, see [kdeDeriche2d](#kdeDeriche2d) instead. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *extent* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *size* parameter should be a [sizeX, sizeY] array indicating the grid dimensions. The *bandwidths* parameters should be a [bandwidthX, bandwidthY] array. The *grid2d* parameter indicates the binning method to use, such as [grid2d_linear](#grid2d_linear) or [grid2d_simple](#grid2d_simple). Returns a Float64Array of gridded density estimates.
 
 <hr/><a id="kdeDeriche1D" href="#kdeDeriche1D">#</a>
-<em>kde</em>.<b>kdeDeriche1D</b>(data, domain, steps, bandwidth, grid1d) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-deriche.js)
+<i>kde</i>.<b>kdeDeriche1D</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidths</i>, <i>grid2d</i>) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/kde-deriche.js)
 
-Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values using Deriche's recursive filter approximation. This method is recommended for normal use. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *domains* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *bins* parameter should be a [binsX, binsY] array indicating the grid dimensions. The *bandwidths* parameters should be a [bandwidthX, bandwidthY] array. The *grid2d* parameter indicates the binning method to use, such as [grid2d_linear](#grid2d_linear) or [grid2d_simple](#grid2d_simple). Returns a Float64Array of size *steps* of gridded density estimates.
+Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values using Deriche's recursive filter approximation. This method is recommended for normal use. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *extent* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *size* parameter should be a [sizeX, sizeY] array indicating the grid dimensions. The *bandwidths* parameters should be a [bandwidthX, bandwidthY] array. The *grid2d* parameter indicates the binning method to use, such as [grid2d_linear](#grid2d_linear) or [grid2d_simple](#grid2d_simple). Returns a Float64Array of gridded density estimates.
 
 ### Utility Methods
 
 Utility methods for grid construction and bandwidth suggestion.
 
 <hr/><a id="grid1d_linear" href="#grid1d_linear">#</a>
-<em>kde</em>.<b>grid1d_linear</b>(data, n, init, scale[, offset = 0]) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/grid1d.js)
+<i>kde</i>.<b>grid1d_linear</b>(<i>data</i>, <i>size</i>, <i>init</i>, <i>scale</i>[, <i>offset</i>]) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/grid1d.js)
 
-Bins a set of numeric *data* values into a 1D output grid of size *n*, using linear interpolation of point mass across adjacent bins. The *init* value indicates the minimum grid value for the data domain. The *scale* parameter is a numeric value for scaling data values to a [0, 1] domain. The optional *offset* parameter (default 0) indicates the number of bins by which to offset the start of the data domain, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
+Bins a set of numeric *data* values into a 1D output grid of size *size*, using linear interpolation of point mass across adjacent bins. The *init* value indicates the minimum grid value for the data domain. The *scale* parameter is a numeric value for scaling data values to a [0, 1] domain. The optional *offset* parameter (default 0) indicates the number of bins by which to offset the start of the data domain, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
 
 <hr/><a id="grid1d_simple" href="#grid1d_simple">#</a>
-<em>kde</em>.<b>grid1d_linear</b>(data, n, init, scale[, offset = 0]) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/grid1d.js)
+<i>kde</i>.<b>grid1d_linear</b>(<i>data</i>, <i>size</i>, <i>init</i>, <i>scale</i>[, <i>offset</i>]) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/grid1d.js)
 
-Bins a set of numeric *data* values into a 1D output grid of size *n*, where the full weight of a point is assigned to the nearest enclosing bin. The *init* value indicates the minimum grid value for the data domain. The *scale* parameter is a numeric value for scaling data values to a [0, 1] domain. The optional *offset* parameter (default 0) indicates the number of bins by which to offset the start of the data domain, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
+Bins a set of numeric *data* values into a 1D output grid of size *size*, where the full weight of a point is assigned to the nearest enclosing bin. The *init* value indicates the minimum grid value for the data domain. The *scale* parameter is a numeric value for scaling data values to a [0, 1] domain. The optional *offset* parameter (default 0) indicates the number of bins by which to offset the start of the data domain, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
 
 <hr/><a id="grid2d_linear" href="#grid2d_linear">#</a>
-<em>kde</em>.<b>grid2d_linear</b>(data, bins, init, scales, offsets) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/grid2d.js)
+<i>kde</i>.<b>grid2d_linear</b>(<i>data</i>, <i>size</i>, <i>init</i>, <i>scales</i>, <i>offsets</i>) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/grid2d.js)
 
-Bins a set of numeric *data* values into a 2D output grid of size *bins*, using linear interpolation of point mass across adjacent bins. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *bins* parameter sets the grid dimensions and should be an [binsX, binsY] array containing two integers. The *init* parameter ([initX, initY]) indicates the minimum grid values for the data domains. The *scale* parameter ([scaleX, scaleY]) provides numeric values for scaling data values to a [0, 1] domain. The *offsets* parameter ([offsetX, offsetY]) indicates the number of bins by which to offset the start of the data domains, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
+Bins a set of numeric *data* values into a 2D output grid of size *size*, using linear interpolation of point mass across adjacent bins. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *size* parameter sets the grid dimensions and should be an [sizeX, sizeY] array containing two integers. The *init* parameter ([initX, initY]) indicates the minimum grid values for the data domains. The *scale* parameter ([scaleX, scaleY]) provides numeric values for scaling data values to a [0, 1] domain. The *offsets* parameter ([offsetX, offsetY]) indicates the number of bins by which to offset the start of the data domains, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
 
 <hr/><a id="grid2d_simple" href="#grid2d_simple">#</a>
-<em>kde</em>.<b>grid2d_simple</b>(data, bins, init, scales, offsets) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/grid2d.js)
+<i>kde</i>.<b>grid2d_simple</b>(<i>data</i>, <i>size</i>, <i>init</i>, <i>scales</i>, <i>offsets</i>) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/grid2d.js)
 
-Bins a set of numeric *data* values into a 2D output grid  of size *bins*, where the full weight of a point is assigned to the nearest enclosing bin. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *bins* parameter sets the grid dimensions and should be an [binsX, binsY] array containing two integers. The *init* parameter ([initX, initY]) indicates the minimum grid values for the data domains. The *scale* parameter ([scaleX, scaleY]) provides numeric values for scaling data values to a [0, 1] domain. The *offsets* parameter ([offsetX, offsetY]) indicates the number of bins by which to offset the start of the data domains, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
+Bins a set of numeric *data* values into a 2D output grid  of size *size*, where the full weight of a point is assigned to the nearest enclosing bin. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *size* parameter sets the grid dimensions and should be an [sizeX, sizeY] array containing two integers. The *init* parameter ([initX, initY]) indicates the minimum grid values for the data domains. The *scale* parameter ([scaleX, scaleY]) provides numeric values for scaling data values to a [0, 1] domain. The *offsets* parameter ([offsetX, offsetY]) indicates the number of bins by which to offset the start of the data domains, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
 
 <hr/><a id="nrd" href="#nrd">#</a>
-<em>kde</em>.<b>nrd</b>(data) · [Source](https://github.com/uwdata/fast-kde/blob/master/src/nrd.js)
+<i>kde</i>.<b>nrd</b>(<i>data</i>) ·
+[Source](https://github.com/uwdata/fast-kde/blob/master/src/nrd.js)
 
 Calculates a suggested bandwidth for an array of numeric *data* values, using Scott's normal reference distribution (NRD) heuristic.
