@@ -1,0 +1,10 @@
+*.sublime-*
+.github
+.gitignore
+.DS_Store
+_site
+benchmarks/
+data/
+docs/
+results/
+test/

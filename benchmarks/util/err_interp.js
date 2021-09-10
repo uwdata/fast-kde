@@ -1,9 +1,4 @@
-module.exports = {
-  err_interp1d,
-  err_interp2d
-};
-
-function err_interp1d(a, b) {
+export function err_interp1d(a, b) {
   const n = a.length;
   const m = b.length;
 
@@ -31,7 +26,7 @@ function err_interp1d(a, b) {
   return [Math.sqrt(rms / n), max, max_idx];
 }
 
-function err_interp2d(a, b) {
+export function err_interp2d(a, b) {
   const n = a.length;
   const m = b.length;
   const nr = Math.sqrt(n) | 0;

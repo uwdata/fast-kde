@@ -1,8 +1,7 @@
-#!/usr/bin/env node
-
-const { benchmarks } = require('..');
-const { performance } = require('perf_hooks');
-const { writeFileSync } = require('fs');
+/* eslint-disable no-console */
+import { benchmarks } from './index.js';
+import { performance } from 'perf_hooks';
+import { writeFileSync } from 'fs';
 
 async function run() {
   for (const name in benchmarks) {

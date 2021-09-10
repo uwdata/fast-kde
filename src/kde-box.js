@@ -1,9 +1,4 @@
-module.exports = {
-  kdeBox1d,
-  kdeBox2d
-};
-
-function kdeBox1d(data, domain, steps, bandwidth, grid1d) {
+export function kdeBox1d(data, domain, steps, bandwidth, grid1d) {
   const K = 3;
   const lo = domain[0];
   const sf = steps / (domain[1] - lo);
@@ -15,7 +10,7 @@ function kdeBox1d(data, domain, steps, bandwidth, grid1d) {
   const n = 2 * o + steps; // num cells
 
   // grid
-  const grid = grid1d(data, lo, sf, n, o);
+  const grid = grid1d(data, n, lo, sf, o);
   const dest = new Float64Array(n);
 
   // use box filter to efficiently approximate gaussian kernel
@@ -33,7 +28,7 @@ function kdeBox1d(data, domain, steps, bandwidth, grid1d) {
   return v.subarray(o, o + steps);
 }
 
-function kdeBox2d(data, domains, steps, bandwidths, grid2d) {
+export function kdeBox2d(data, domains, steps, bandwidths, grid2d) {
   const [xdom, ydom] = domains;
   const [xn, yn] = steps;
   const [bwx, bwy] = bandwidths;

@@ -1,14 +1,10 @@
-const { penguins } = require('./data');
-const { grid1d_shifted } = require('../kde/grid1d');
-const { kdeCDF1d } = require('../kde/kde-cdf');
-const { kdeBox1d } = require('../kde/kde-box');
-const { kdeDeriche1d } = require('../kde/kde-deriche');
-const { kdeExtBox1d } = require('../kde/kde-extbox');
-const { nrd } = require('../kde/nrd');
-const { rnorm } = require('../kde/rnorm');
-const { performance } = require('perf_hooks');
+import { penguins } from './util/data.js';
+import {
+  grid1d_linear, kdeBox1d, kdeCDF1d, kdeDeriche1d, kdeExtBox1d, nrd
+} from '../src/index.js';
+import { performance } from 'perf_hooks';
 
-module.exports = async function() {
+export default async function() {
   const masses = await penguins();
   const pdomain = [2000, 7000];
   const mn = masses.length;
@@ -16,7 +12,7 @@ module.exports = async function() {
   const sample = () => Math.round(rnorm(masses[(mn * Math.random()) | 0], mw));
 
   const m = 512;
-  const gridFunc = grid1d_shifted;
+  const gridFunc = grid1d_linear;
   const sizes = [
     1e2, 1e3, 1e4,
     1e2, 2e2, 3e2, 4e2, 5e2, 6e2, 7e2, 8e2, 9e2,
@@ -68,4 +64,30 @@ module.exports = async function() {
   }
 
   return data.slice(12); // drop warm-up trials
-};
+}
+
+let next = NaN;
+
+function rnorm(mean = 0, stdev = 1) {
+  let x = 0;
+  let y = 0;
+  let rds = 0;
+
+  if (!Number.isNaN(next)) {
+    x = next;
+    next = NaN;
+  } else {
+    do {
+      x = Math.random() * 2 - 1;
+      y = Math.random() * 2 - 1;
+      rds = x * x + y * y;
+    } while (rds == 0 || rds > 1);
+
+    // Box-Muller transform
+    const c = Math.sqrt(-2 * Math.log(rds) / rds);
+    x *= c;
+    next = y * c;
+  }
+
+  return mean + x * stdev;
+}

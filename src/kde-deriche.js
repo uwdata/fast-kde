@@ -1,16 +1,16 @@
+// Deriche's approximation of Gaussian smoothing
+// Adapted from Getreuer's C implementation (BSD license)
+// https://www.ipol.im/pub/art/2013/87/gaussian_20131215.tgz
+// http://dev.ipol.im/~getreuer/code/doc/gaussian_20131215_doc/gaussian__conv__deriche_8c.html
+
 const EPSILON = 1e-8;
 
-module.exports = {
-  kdeDeriche1d,
-  kdeDeriche2d
-};
-
-function kdeDeriche1d(data, domain, steps, bandwidth, grid1d) {
+export function kdeDeriche1d(data, domain, steps, bandwidth, grid1d) {
   const lo = domain[0];
   const sf = (steps) / (domain[1] - lo);
   const d = dericheConv1d(
       derichePrep(bandwidth * sf, 4),
-      grid1d(data, lo, sf, steps, 0),
+      grid1d(data, steps, lo, sf, 0),
       steps, 1
     );
 
@@ -20,7 +20,7 @@ function kdeDeriche1d(data, domain, steps, bandwidth, grid1d) {
   return d;
 }
 
-function kdeDeriche2d(data, domains, steps, bandwidths, grid2d) {
+export function kdeDeriche2d(data, domains, steps, bandwidths, grid2d) {
   const [xdom, ydom] = domains;
   const [xn, yn] = steps;
   const [bwx, bwy] = bandwidths;

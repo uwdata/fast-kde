@@ -1,12 +1,11 @@
-const { cars } = require('./data');
-const { err_interp2d } = require('../kde/err_interp');
-const { grid2d_shifted, grid2d_simple } = require('../kde/grid2d');
-const { kdeBox2d } = require('../kde/kde-box');
-const { kdeCDF2d } = require('../kde/kde-cdf');
-const { kdeDeriche2d } = require('../kde/kde-deriche');
-const { kdeExtBox2d } = require('../kde/kde-extbox');
+import { cars } from './util/data.js';
+import { err_interp2d } from './util/err_interp.js';
+import {
+  grid2d_linear, grid2d_simple,
+  kdeBox2d, kdeCDF2d, kdeDeriche2d, kdeExtBox2d
+} from '../src/index.js';
 
-module.exports = async function() {
+export default async function() {
   const cars_xy = await cars();
   const dom_xy = [[0, 1], [0, 1]];
   const WIDTH = 512;
@@ -25,7 +24,7 @@ module.exports = async function() {
 
       for (let ti = 0; ti < type.length; ++ti) {
         const t = type[ti];
-        const gridFunc = t === 'Simple' ? grid2d_simple : grid2d_shifted;
+        const gridFunc = t === 'Simple' ? grid2d_simple : grid2d_linear;
         const grid = t + ' Binning';
 
         const der = kdeDeriche2d(cars_xy, dom_xy, [n, n], [w, w], gridFunc);
@@ -67,4 +66,4 @@ module.exports = async function() {
   }
 
   return data;
-};
+}

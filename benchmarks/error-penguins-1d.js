@@ -1,12 +1,11 @@
-const { penguins } = require('./data');
-const { err_interp1d } = require('../kde/err_interp');
-const { grid1d_shifted, grid1d_simple } = require('../kde/grid1d');
-const { kdeBox1d } = require('../kde/kde-box');
-const { kdeCDF1d } = require('../kde/kde-cdf');
-const { kdeDeriche1d } = require('../kde/kde-deriche');
-const { kdeExtBox1d } = require('../kde/kde-extbox');
+import { penguins } from './util/data.js';
+import { err_interp1d } from './util/err_interp.js';
+import {
+  grid1d_linear, grid1d_simple,
+  kdeBox1d, kdeCDF1d, kdeDeriche1d, kdeExtBox1d
+} from '../src/index.js';
 
-module.exports = async function() {
+export default async function() {
   const masses = await penguins();
   const domain = [2000, 7000];
 
@@ -17,7 +16,7 @@ module.exports = async function() {
   const data = [];
 
   type.forEach(t => {
-    const gridFunc = t === 'Simple' ? grid1d_simple : grid1d_shifted;
+    const gridFunc = t === 'Simple' ? grid1d_simple : grid1d_linear;
     const grid = t + ' Binning';
     bins.forEach(n => {
       bw.forEach(w => {
@@ -61,4 +60,4 @@ module.exports = async function() {
   });
 
   return data;
-};
+}

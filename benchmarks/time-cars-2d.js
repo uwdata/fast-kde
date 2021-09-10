@@ -1,15 +1,12 @@
-const { cars } = require('./data');
-const { grid2d_shifted } = require('../kde/grid2d');
-const { kdeBox2d } = require('../kde/kde-box');
-const { kdeDeriche2d } = require('../kde/kde-deriche');
-const { kdeExtBox2d } = require('../kde/kde-extbox');
-const { performance } = require('perf_hooks');
+import { cars } from './util/data.js';
+import { grid2d_linear, kdeBox2d, kdeDeriche2d, kdeExtBox2d } from '../src/index.js';
+import { performance } from 'perf_hooks';
 
-module.exports = async function() {
+export default async function() {
   const cars_xy = await cars();
   const dom_xy = [[0, 1], [0, 1]];
 
-  const gridFunc = grid2d_shifted;
+  const gridFunc = grid2d_linear;
   const n = 512;
   const bw = [0.1].concat(Array.from({ length: 20 }, (d, i) => 0.01 + 0.01 * i));
   const data = [];
@@ -57,4 +54,4 @@ module.exports = async function() {
   }
 
   return data.slice(6); // drop warm-up trials
-};
+}
