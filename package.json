@@ -11,6 +11,8 @@
   "license": "BSD-3-Clause",
   "author": "Jeffrey Heer (http://idl.cs.washington.edu)",
   "main": "src/index.js",
+  "unpkg": "dist/fast-kde.min.js",
+  "jsdelivr": "dist/fast-kde.min.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/uwdata/fast-kde.git"
