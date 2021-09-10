@@ -22,7 +22,8 @@
     "benchmarks": "node ./benchmarks/run",
     "lint": "eslint src benchmarks --ext .js",
     "prebuild": "rimraf dist && mkdir dist",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "prepublishOnly": "yarn lint && yarn build"
   },
   "devDependencies": {
     "arquero": "^4.8.4",
