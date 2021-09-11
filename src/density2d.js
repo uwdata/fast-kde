@@ -30,11 +30,15 @@ export function density2d() {
     const ystep = (y1 - y0) / size[1];
     return Array.from(
       density(data),
-      (value, i) => ({
-        x: x0 + i * xstep,
-        y: y0 + i * ystep,
-        value
-      })
+      (value, i) => {
+        const xi = i % size[0];
+        const yi = (i / size[0]) | 0;
+        return {
+          x: x0 + xi * xstep,
+          y: y0 + yi * ystep,
+          value
+        };
+      }
     );
   };
 
