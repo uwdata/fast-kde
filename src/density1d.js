@@ -11,14 +11,14 @@ export function density1d() {
   let extent = [0, 1];
 
   function density(data) {
-    const points = x ? data.map(v => x(v)) : data;
+    const points = x ? data.map(x) : data;
     const bw = bandwidth || nrd(points);
     return method(points, extent, size, bw, grid);
   }
 
   density.points = function(data) {
-    const lo = extent[0];
-    const step = (extent[1] - extent[0]) / size;
+    const [lo, hi] = extent;
+    const step = (hi - lo) / size;
     return Array.from(
       density(data),
       (value, i) => ({ x: lo + i * step, value })
