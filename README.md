@@ -44,42 +44,42 @@ kde.density1d()
   .points([1, 2, 5, 5, 6, 9])
 ```
 
-<a name="_density1d" href="#_density1d">#</a>
+<a id="_density1d" href="#_density1d">#</a>
 <i>density1d</i>(<i>data</i>)
 
 Computes a 1D Gaussian kernel density estimate using the current settings for the given *data* and returns a Float64Array of gridded density values. To instead produce an array of objects containing coordinate values and density estimates, use [density1d.points()](#density1d_points).
 
-<a name="density1d_points" href="#density1d_points">#</a>
+<a id="density1d_points" href="#density1d_points">#</a>
 <i>density1d</i>.<b>points</b>(<i>data</i>)
 
 Computes a 1D Gaussian kernel density estimate using the current settings for the given *data* and returns an array of objects containing the grid coordinate value (`x`) and density value (`value`).
 
-<a name="density1d_x" href="#density1d_x">#</a>
+<a id="density1d_x" href="#density1d_x">#</a>
 <i>density1d</i>.<b>x</b>([<i>x</i>])
 
 Get or set the *x* coordinate getter for the input data. Defaults to the identity function, which assumes a flat array of values.
 
-<a name="density1d_grid" href="#density1d_grid">#</a>
+<a id="density1d_grid" href="#density1d_grid">#</a>
 <i>density1d</i>.<b>grid</b>([<i>grid</i>])
 
 Get or set the *grid* function for binning the input data into a one-dimensional grid, such as [grid1d_linear](#grid1d_linear) (the default) or [grid1d_simple](#grid1d_simple).
 
-<a name="density1d_size" href="#density1d_size">#</a>
+<a id="density1d_size" href="#density1d_size">#</a>
 <i>density1d</i>.<b>size</b>([<i>size</i>])
 
 Get or set the *size* (default 512) of the binned data grid.
 
-<a name="density1d_bandwidth" href="#density1d_bandwidth">#</a>
+<a id="density1d_bandwidth" href="#density1d_bandwidth">#</a>
 <i>density1d</i>.<b>bandwidth</b>([<i>bandwidth</i>])
 
 Get or set the *bandwidth* (standard deviation) of the Gaussian kernel. If set to `null` or zero (the default), the [normal reference density](#nrd) heuristic will be used to select a bandwidth automatically.
 
-<a name="density1d_extent" href="#density1d_extent">#</a>
+<a id="density1d_extent" href="#density1d_extent">#</a>
 <i>density1d</i>.<b>extent</b>([<i>extent</i>])
 
 Get or set the *extent* ([x0, x1]) of the data domain over which to perform density estimation. Any data points outside this extent will be ignored. The value defaults to [0, 1]. Note that the estimation helper does _not_ automatically select a domain based on the input data.
 
-<a name="density1d_method" href="#density1d_method">#</a>
+<a id="density1d_method" href="#density1d_method">#</a>
 <i>density1d</i>.<b>method</b>([<i>method</i>])
 
 Get or set the density estimation *method* to use. One of [kdeDeriche1d](#kdeDeriche1d) (the default), [kdeBox1d](#kdeBox1d), [kdeExtBox1d](#kdeExtBox1d), or [kdeCDF1d](#kdeCDF1d).
@@ -102,47 +102,47 @@ kde.density2d()
   .points([[1, 1], [1, 2], [5, 4], [5, 3], [6, 2], [8, 7]])
 ```
 
-<a name="_density2d" href="#_density2d">#</a>
+<a id="_density2d" href="#_density2d">#</a>
 <i>density2d</i>(<i>data</i>)
 
 Computes a 2D Gaussian kernel density estimate for the given *data* using the current settings and returns a Float64Array of gridded density values. To instead produce an array of objects containing coordinate values and density estimates, use [density2d.points()](#density2d_points).
 
-<a name="density2d_points" href="#density2d_points">#</a>
+<a id="density2d_points" href="#density2d_points">#</a>
 <i>density2d</i>.<b>points</b>(<i>data</i>)
 
 Computes a 2D Gaussian kernel density estimate for the given *data* using the current settings and returns an array of objects containing the grid coordinate (`x`, `y`) and density (`value`) values.
 
-<a name="density2d_x" href="#density2d_x">#</a>
+<a id="density2d_x" href="#density2d_x">#</a>
 <i>density2d</i>.<b>x</b>([<i>x</i>])
 
 Get or set the *x* coordinate getter for the input data. Defaults to index 0 (i.e., the first element if individual data points are provided as arrays).
 
-<a name="density2d_y" href="#density2d_y">#</a>
+<a id="density2d_y" href="#density2d_y">#</a>
 <i>density2d</i>.<b>y</b>([<i>y</i>])
 
 Get or set the *y* coordinate getter for the input data. Defaults to index 1 (i.e., the second element if individual data points are provided as arrays).
 
-<a name="density2d_grid" href="#density2d_grid">#</a>
+<a id="density2d_grid" href="#density2d_grid">#</a>
 <i>density2d</i>.<b>grid</b>([<i>grid</i>])
 
 Get or set the *grid* function for binning the input data into a two dimensional grid, such as [grid2d_linear](#grid2d_linear) (the default) or [grid2d_simple](#grid2d_simple).
 
-<a name="density2d_size" href="#density2d_size">#</a>
+<a id="density2d_size" href="#density2d_size">#</a>
 <i>density2d</i>.<b>size</b>([<i>size</i>])
 
 Get or set the *size* (default [256, 256]) of the binned data grid.
 
-<a name="density2d_bandwidth" href="#density2d_bandwidth">#</a>
+<a id="density2d_bandwidth" href="#density2d_bandwidth">#</a>
 <i>density2d</i>.<b>bandwidth</b>([<i>bandwidth</i>])
 
 Get or set the *bandwidth*s (standard deviations) of the Gaussian kernels as a two element array. If an entry is set to `null` or zero (the defaults), the [normal reference density](#nrd) heuristic will be used to select a bandwidth automatically for that dimension.
 
-<a name="density2d_extent" href="#density2d_extent">#</a>
+<a id="density2d_extent" href="#density2d_extent">#</a>
 <i>density2d</i>.<b>extent</b>([<i>extent</i>])
 
 Get or set the *extent*s ([[x0, x1], [y0, y1]]) of the data domain over which to perform density estimation. Any data points outside this extent will be ignored. The value defaults to [[0, 1], [0, 1]]. Note that the estimation helper does _not_ automatically select domains based on the input data.
 
-<a name="density2d_method" href="#density2d_method">#</a>
+<a id="density2d_method" href="#density2d_method">#</a>
 <i>density2d</i>.<b>method</b>([<i>method</i>])
 
 Get or set the density estimation *method* to use. One of [kdeDeriche2d](#kdeDeriche2d) (the default), [kdeBox2d](#kdeBox2d), [kdeExtBox2d](#kdeExtBox2d), or [kdeCDF2d](#kdeCDF2d).
