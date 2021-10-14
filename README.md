@@ -1,8 +1,8 @@
 # Fast & Accurate Gaussian Kernel Density Estimation
 
-Methods and benchmarks for fast, approximate Gaussian kernel density estimation.
+Methods and benchmarks for fast, approximate Gaussian kernel density estimation. This repo is for archiving research results. _Want to use fast KDE in your own projects?_ **See [github.com/uwdata/kde](https://github.com/uwdata/kde)!**
 
-This repo contains code (`src/`) and benchmark (`benchmarks/`) scripts for the VIS 2021 Short Paper "Fast & Accurate Gaussian Kernel Density Estimation". All code is written as ESM modules. Running benchmarks requires node.js version 13.2 or higher.
+This repo contains code (`src/`) and benchmark (`benchmarks/`) scripts for the VIS 2021 Short Paper "Fast & Accurate Gaussian Kernel Density Estimation". All code is written as ESM modules. Running benchmarks requires Node.js version 13.2 or higher.
 
 ## Build Instructions
 
