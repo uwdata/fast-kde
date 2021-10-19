@@ -1,53 +1,51 @@
-import { grid1d_linear } from './grid1d.js';
-import { kdeDeriche1d } from './kde-deriche.js';
+import { accessor } from './accessor.js';
+import { bin1d } from './bin1d.js';
+import { dericheConfig, dericheConv1d } from './deriche.js';
+import { extent as densityExtent } from './extent.js';
 import { nrd } from './nrd.js';
 
-export function density1d() {
-  let x;
-  let method = kdeDeriche1d;
-  let grid = grid1d_linear;
-  let size = 512;
-  let bandwidth;
-  let extent = [0, 1];
+export function density1d(data, options = {}) {
+  const { adjust = 1, pad = 3, bins = 512 } = options;
+  const x = accessor(options.x, x => x);
+  const w = accessor(options.weight, () => 1 / data.length);
 
-  function density(data) {
-    const points = x ? data.map(x) : data;
-    const bw = bandwidth || nrd(points);
-    return method(points, extent, size, bw, grid);
+  let bandwidth = options.bandwidth ?? adjust * nrd(data, x);
+
+  const [lo, hi] = options.extent ?? densityExtent(data, x, pad * bandwidth);
+  const grid = bin1d(data, x, w, lo, hi, bins);
+  const delta = (hi - lo) / (bins - 1);
+
+  let config = dericheConfig(bandwidth / delta);
+  let result;
+
+  function* points(x = 'x', y = 'y') {
+    const result = estimator.grid();
+    const scale = 1 / delta;
+    for (let i = 0; i < bins; ++i) {
+      yield {
+        [x]: lo + i * delta,
+        [y]: result[i] * scale
+      };
+    }
   }
 
-  density.points = function(data) {
-    const [lo, hi] = extent;
-    const step = (hi - lo) / size;
-    return Array.from(
-      density(data),
-      (value, i) => ({ x: lo + i * step, value })
-    );
+  const estimator = {
+    [Symbol.iterator]: points,
+    points,
+    grid: () => result || (result = dericheConv1d(config, grid, bins)),
+    bandwidth(_) {
+      if (arguments.length) {
+        if (_ !== bandwidth) {
+          bandwidth = _;
+          result = null;
+          config = dericheConfig(bandwidth / delta);
+        }
+        return estimator;
+      } else {
+        return bandwidth;
+      }
+    }
   };
 
-  density.x = function(_) {
-    return arguments.length ? (x = _, this) : x;
-  };
-
-  density.grid = function(_) {
-    return arguments.length ? (grid = _, this) : grid;
-  };
-
-  density.size = function(_) {
-    return arguments.length ? (size = _, this) : size;
-  };
-
-  density.bandwidth = function(_) {
-    return arguments.length ? (bandwidth = _, this) : bandwidth;
-  };
-
-  density.extent = function(_) {
-    return arguments.length ? (extent = _, this) : extent;
-  };
-
-  density.method = function(_) {
-    return arguments.length ? (method = _, this) : method;
-  };
-
-  return density;
+  return estimator;
 }

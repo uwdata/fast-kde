@@ -3,47 +3,11 @@
 // https://www.ipol.im/pub/art/2013/87/gaussian_20131215.tgz
 // http://dev.ipol.im/~getreuer/code/doc/gaussian_20131215_doc/gaussian__conv__deriche_8c.html
 
-const EPSILON = 1e-8;
-
-export function kdeDeriche1d(data, domain, steps, bandwidth, grid1d) {
-  const lo = domain[0];
-  const sf = (steps) / (domain[1] - lo);
-  const d = dericheConv1d(
-      derichePrep(bandwidth * sf, 4),
-      grid1d(data, steps, lo, sf, 0),
-      steps, 1
-    );
-
-  for (let i = 0; i < d.length; ++i) {
-    if (d[i] < EPSILON) d[i] = 0;
-  }
-  return d;
-}
-
-export function kdeDeriche2d(data, domains, steps, bandwidths, grid2d) {
-  const [xdom, ydom] = domains;
-  const [xn, yn] = steps;
-  const [bwx, bwy] = bandwidths;
-
-  const [x0, x1] = xdom;
-  const [y0, y1] = ydom;
-  const sx = xn / (x1 - x0);
-  const sy = yn / (y1 - y0);
-  const grid = grid2d(data, steps, [x0, y0], [sx, sy], [0, 0]);
-
-  if (bwx <= 0 && bwy <= 0) return grid.slice();
-
-  // TODO: could check for matching stdev and reuse
-  const cx = derichePrep(bwx * sx, 4);
-  const cy = derichePrep(bwy * sy, 4);
-  return dericheConv2d(cx, cy, grid, steps);
-}
-
-function derichePrep(sigma) {
+export function dericheConfig(sigma) {
   // compute causal filter coefficients
   const a = new Float64Array(5);
   const bc = new Float64Array(4);
-  causal_coeff(a, bc, sigma);
+  dericheCausalCoeff(a, bc, sigma);
 
   // numerator coefficients of the anticausal filter
   const ba = Float64Array.of(
@@ -72,7 +36,7 @@ function derichePrep(sigma) {
   };
 }
 
-function causal_coeff(a_out, b_out, sigma) {
+function dericheCausalCoeff(a_out, b_out, sigma) {
   const K = 4;
 
   const alpha = Float64Array.of(
@@ -93,7 +57,7 @@ function causal_coeff(a_out, b_out, sigma) {
     -x2 * Math.cos(-y2), x2 * Math.sin(-y2)
   );
 
-  const denom = sigma * 2.50662827463100050241576528481104525;
+  const denom = sigma * 2.5066282746310007;
 
   // Initialize b/a = alpha[0] / (1 + beta[0] z^-1)
   const b = Float64Array.of(alpha[0], alpha[1], 0, 0, 0, 0, 0, 0);
@@ -129,7 +93,7 @@ function causal_coeff(a_out, b_out, sigma) {
   }
 }
 
-function dericheConv2d(cx, cy, grid, [nx, ny]) {
+export function dericheConv2d(cx, cy, grid, [nx, ny]) {
   // allocate buffers
   const yc = new Float64Array(Math.max(nx, ny)); // causal
   const ya = new Float64Array(Math.max(nx, ny)); // anticausal
@@ -148,19 +112,17 @@ function dericheConv2d(cx, cy, grid, [nx, ny]) {
     dericheConv1d(cy, dy, ny, nx, yc, ya, h, dy);
   }
 
-  for (let i = 0; i < d.length; ++i) {
-    if (d[i] < EPSILON) d[i] = 0;
-  }
   return d;
 }
 
-function dericheConv1d(
+export function dericheConv1d(
   c, src, N,
   stride = 1,
   y_causal = new Float64Array(N),
   y_anticausal = new Float64Array(N),
   h = new Float64Array(5),
-  d = y_causal
+  d = y_causal,
+  init = dericheInitZeroPad
 ) {
   const stride_2 = stride * 2;
   const stride_3 = stride * 3;
@@ -169,7 +131,7 @@ function dericheConv1d(
   let i, n;
 
   // Initialize causal filter on the left boundary.
-  initZeroPad(
+  init(
     y_causal, src, N, stride,
     c.b_causal, 3, c.a, 4, c.sum_causal, h, c.sigma
   );
@@ -193,7 +155,7 @@ function dericheConv1d(
   }
 
   // Initialize anticausal filter on the right boundary.
-  initZeroPad(
+  init(
     y_anticausal, src, N, -stride,
     c.b_anticausal, 4, c.a, 4, c.sum_anticausal, h, c.sigma
   );
@@ -217,13 +179,13 @@ function dericheConv1d(
 
   // Sum the causal and anticausal responses to obtain the final result.
   for (n = 0, i = 0; n < N; ++n, i += stride) {
-    d[i] = y_causal[n] + y_anticausal[N - n - 1];
+    d[i] = Math.max(0, y_causal[n] + y_anticausal[N - n - 1]);
   }
 
   return d;
 }
 
-function initZeroPad(dest, src, N, stride, b, p, a, q, sum, h) {
+export function dericheInitZeroPad(dest, src, N, stride, b, p, a, q, sum, h) {
   const stride_N = Math.abs(stride) * N;
   const off = stride < 0 ? stride_N + stride : 0;
   let i, n, m;

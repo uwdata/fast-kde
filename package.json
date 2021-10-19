@@ -1,12 +1,12 @@
 {
   "name": "fast-kde",
   "type": "module",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "keywords": [
     "kernel density estimation",
     "kde",
-    "deriche",
-    "box filter"
+    "heatmap",
+    "deriche"
   ],
   "license": "BSD-3-Clause",
   "author": "Jeffrey Heer (http://idl.cs.washington.edu)",
@@ -18,18 +18,19 @@
     "url": "https://github.com/uwdata/fast-kde.git"
   },
   "scripts": {
-    "prebenchmarks": "rimraf results && mkdir results",
-    "benchmarks": "node ./benchmarks/run",
-    "lint": "eslint src benchmarks --ext .js",
     "prebuild": "rimraf dist && mkdir dist",
     "build": "rollup -c",
-    "prepublishOnly": "yarn lint && yarn build"
+    "test": "mocha 'test/**/*-test.js' && eslint src test",
+    "prepublishOnly": "yarn test && yarn build"
+  },
+  "dependencies": {
+    "d3-color": "^3.0.1"
   },
   "devDependencies": {
-    "arquero": "^4.8.4",
-    "eslint": "^7.32.0",
+    "eslint": "^8.0.1",
+    "mocha": "^9.1.3",
     "rimraf": "^3.0.2",
-    "rollup": "^2.56.3",
+    "rollup": "^2.58.0",
     "rollup-plugin-bundle-size": "^1.0.3",
     "rollup-plugin-terser": "^7.0.2"
   }

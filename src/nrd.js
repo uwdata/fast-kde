@@ -1,7 +1,7 @@
 // Scott, D. W. (1992) Multivariate Density Estimation:
 // Theory, Practice, and Visualization. Wiley.
-export function nrd(data) {
-  const values = data.filter(v => v != null && v >= v);
+export function nrd(data, x) {
+  const values = data.map(x).filter(v => v != null && v >= v);
   values.sort((a, b) => a - b);
   const sd = stdev(values);
   const q1 = quantile(values, 0.25);

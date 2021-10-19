@@ -1,74 +1,84 @@
-import { grid2d_linear } from './grid2d.js';
-import { kdeDeriche2d } from './kde-deriche.js';
+import { accessor } from './accessor.js';
+import { bin2d } from './bin2d.js';
+import { dericheConfig, dericheConv2d } from './deriche.js';
+import { extent as densityExtent } from './extent.js';
+import { heatmap } from './heatmap.js';
 import { nrd } from './nrd.js';
 
-export function density2d() {
-  let x = d => d[0];
-  let y = d => d[1];
-  let method = kdeDeriche2d;
-  let grid = grid2d_linear;
-  let size = [256, 256];
-  let bandwidth = [0, 0];
-  let extent = [[0, 1], [0, 1]];
+export function density2d(data, options = {}) {
+  const { adjust = 1, pad = 3, bins = [256, 256] } = options;
+  const x = accessor(options.x, d => d[0]);
+  const y = accessor(options.y, d => d[1]);
+  const w = accessor(options.weight, () => 1 / data.length);
 
-  function density(data) {
-    const points = [
-      data.map(v => x(v)),
-      data.map(v => y(v))
-    ];
-    const bw = [
-      bandwidth[0] || nrd(points[0]),
-      bandwidth[1] || nrd(points[1])
-    ];
-    return method(points, extent, size, bw, grid);
-  }
+  let [
+    bwX = adjust * nrd(data, x),
+    bwY = adjust * nrd(data, y)
+  ] = number2(options.bandwidth);
 
-  density.points = function(data) {
-    const [x0, x1] = extent[0];
-    const [y0, y1] = extent[1];
-    const xstep = (x1 - x0) / size[0];
-    const ystep = (y1 - y0) / size[1];
-    return Array.from(
-      density(data),
-      (value, i) => {
-        const xi = i % size[0];
-        const yi = (i / size[0]) | 0;
-        return {
-          x: x0 + xi * xstep,
-          y: y0 + yi * ystep,
-          value
+  const [
+    [x0, x1] = densityExtent(data, x, pad * bwX),
+    [y0, y1] = densityExtent(data, y, pad * bwY)
+  ] = number2_2(options.extent);
+
+  const [binsX, binsY] = number2(bins);
+
+  const grid = bin2d(data, x, y, w, x0, x1, binsX, y0, y1, binsY);
+  const deltaX = (x1 - x0) / (binsX - 1);
+  const deltaY = (y1 - y0) / (binsY - 1);
+
+  let configX = dericheConfig(bwX / deltaX);
+  let configY = dericheConfig(bwY / deltaY);
+  let result;
+
+  function* points(x = 'x', y = 'y', z = 'z') {
+    const result = estimator.grid();
+    const scale = 1 / (deltaX * deltaY);
+    for (let k = 0, j = 0; j < binsY; ++j) {
+      for (let i = 0; i < binsX; ++i, ++k) {
+        yield {
+          [x]: x0 + i * deltaX,
+          [y]: y0 + j * deltaY,
+          [z]: result[k] * scale
         };
       }
-    );
+    }
+  }
+
+  const estimator = {
+    [Symbol.iterator]: points,
+    points,
+    grid: () => result || (result = dericheConv2d(configX, configY, grid, [binsX, binsY])),
+    heatmap: ({ color, clamp, canvas } = {}) => heatmap(estimator.grid(), binsX, binsY, color, clamp, canvas),
+    bandwidth(_) {
+      if (arguments.length) {
+        const [_0, _1] = number2(_);
+        if (_0 !== bwX) {
+          result = null;
+          configX = dericheConfig((bwX = _0) / deltaX);
+        }
+        if (_1 !== bwY) {
+          result = null;
+          configY = dericheConfig((bwY = _1) / deltaY);
+        }
+        return estimator;
+      } else {
+        return [bwX, bwY];
+      }
+    }
   };
 
-  density.x = function(_) {
-    return arguments.length ? (x = _, this) : x;
-  };
+  return estimator;
+}
 
-  density.y = function(_) {
-    return arguments.length ? (y = _, this) : y;
-  };
+function number2(_) {
+  return _ == null ? [undefined, undefined]
+    : typeof _ === 'number' ? [_, _]
+    : _;
+}
 
-  density.grid = function(_) {
-    return arguments.length ? (grid = _, this) : grid;
-  };
-
-  density.size = function(_) {
-    return arguments.length ? (size = _, this) : size;
-  };
-
-  density.bandwidth = function(_) {
-    return arguments.length ? (bandwidth = _, this) : bandwidth;
-  };
-
-  density.extent = function(_) {
-    return arguments.length ? (extent = _, this) : extent;
-  };
-
-  density.method = function(_) {
-    return arguments.length ? (method = _, this) : method;
-  };
-
-  return density;
+function number2_2(_) {
+  return _ == null ? [undefined, undefined]
+    : typeof _[0] === 'number' ? [_, _]
+    : _;
 }

@@ -1,222 +1,230 @@
-# Fast & Accurate Gaussian Kernel Density Estimation
+# Fast Gaussian Kernel Density Estimation
 
-Methods and benchmarks for fast, approximate Gaussian kernel density estimation. This repo is for archiving research results. _Want to use fast KDE in your own projects?_ **See [github.com/uwdata/kde](https://github.com/uwdata/kde)!**
+Fast Gaussian kernel density estimation in 1D or 2D. Provides accurate, linear-time O(N + K) estimation using Deriche's approximation. This package is based on the IEEE VIS 2021 Short Paper [Fast & Accurate Gaussian Kernel Density Estimation](https://idl.cs.washington.edu/papers/fast-kde).
 
-This repo contains code (`src/`) and benchmark (`benchmarks/`) scripts for the VIS 2021 Short Paper "Fast & Accurate Gaussian Kernel Density Estimation". All code is written as ESM modules. Running benchmarks requires Node.js version 13.2 or higher.
+## Citation
+
+If you use or build on this package in academic work, please use this citation:
+
+```
+@inproceedings{2021-Heer-FastKDE,
+ title = {Fast \& Accurate Gaussian Kernel Density Estimation},
+ author = {Jeffrey Heer},
+ booktitle = {IEEE VIS Short Papers},
+ year = {2021},
+ url = {http://idl.cs.washington.edu/papers/fast-kde},
+}
+```
+
+## Usage Examples
+
+For interactive examples, see our [Fast KDE Observable notebook](https://observablehq.com/@uwdata/fast-gaussian-kde).
+
+### 1D Density Estimation
+
+```js
+import { density1d } from 'fast-kde';
+
+const data = [
+  {u: 1, v: 1}, {u: 1, v: 2}, {u: 5, v: 4},
+  {u: 5, v: 3}, {u: 6, v: 2}, {u: 8, v: 7}
+];
+
+// 1d density estimation, with automatic bandwidth and extent
+// resulting estimator d1 is an object and also an iterable
+let d1 = density1d([1, 1, 5, 5, 6, 8]);
+
+// 1d density estimation, with accessor function
+d1 = density1d(data, { x: d => d.u });
+
+// 1d density estimation, with property key accessor
+d1 = density1d(data, { x: 'u' });
+
+// 1d density estimation, with given bandwidth and extent
+d1 = density1d(data, { x: 'u', bandwidth: 1, extent: [0, 10] });
+
+// efficiently update bandwidth on estimator (extent remains unchanged)
+d1.bandwidth(0.5)
+
+// generate array of {x, y} sample points
+let p1 = Array.from(d1);
+
+// generate array of {a, b} sample points (instead of {x, y})
+p1 = [...d1.points('a', 'b')]
+
+// retrieve internal sample grid array of density estimates
+// these values represent the total probability mass in each bin
+// they are not (yet) scaled to probability density function estimates
+let g1 = d1.grid();
+```
+
+### 2D Density Estimation
+
+```js
+import { density2d } from 'fast-kde';
+import { interpolatePiYG } from 'd3-scale-chromatic';
+
+const data = [
+  {u: 1, v: 1}, {u: 1, v: 2}, {u: 5, v: 4},
+  {u: 5, v: 3}, {u: 6, v: 2}, {u: 8, v: 7}
+];
+
+// 2d density estimation, with automatic bandwidth and extent
+let d2 = density2d(data, { x: 'u', y: 'v' });
+
+// 2d density estimation, with bandwidth and extent shared across (x, y)
+d2 = density2d(data, { x: 'u', y: 'v', bandwidth: 1, extent: [0, 10] });
+
+// 2d density estimation, with bandwidth and extent that differ across (x, y)
+d2 = density2d(data, { x: 'u', y: 'v', bandwidth: [1, 0.5], extent: [[0, 10], [1, 9]] });
+
+// 2d density estimation, with customized x- and y-bin counts
+d2 = density2d(data, { x: 'u', y: 'v', bins: [256, 256] });
+
+// generate array of {x, y, z} sample points
+let p2 = [...d2];
+
+// generate array of {a, b, v} sample points (instead of {x, y, z})
+p2 = [...d2.points('a', 'b', 'v')]
+
+// HTML canvas element with a bins[0] x bins[1] heatmap image
+let h2 = d2.heatmap();
+
+// HTML canvas heatmap with custom interpolator from d3-scale-chromatic
+h2 = d2.heatmap({ color: interpolatePiYG })
+
+// retrieve internal sample grid array of density estimates
+// these values represent the total probability mass in each bin
+// they are not (yet) scaled to probability density function estimates
+let g2 = d2.grid();
+```
 
 ## Build Instructions
 
-To build a bundle (ESM module or minified UMD):
+All code is written as ESM modules, and uses the `"type": "module"` Node.js setting. To build a bundle (ESM module or minified UMD):
 
 1. Run `yarn` to install dependencies.
 2. Run `yarn build` to build the bundles.
 
 Compiled bundles will be written to the `dist` directory.
 
-## Benchmark Instructions
-
-1. Run `yarn` to install dependencies.
-2. Run `yarn benchmarks` to run benchmarks.
-3. Wait until the benchmarks complete...
-
-Benchmark result datasets will be written to the `results` directory as JSON files.
-
 ## API Documentation
 
-### Density Estimate Helpers
-
-Convenience methods for performing 1D or 2D density estimation.
+### 1D Density Estimation
 
 <hr/><a id="density1d" href="#density1d">#</a>
-<i>kde</i>.<b>density1d</b>()
+<i>kde</i>.<b>density1d</b>(<i>data</i>[, <i>options</i>])
 
-Creates a new 1D density estimate helper with default settings.
+Creates a new 1D density estimator for the input *data*. Returns an estimator object that includes the methods listed below, and also provides an iterator over resulting density points.
+
+* *data*: An array of input data values for which to perform density estimation. The array values may be numbers or objects.
+* *options*: Options for configuring density estimation.
+  * *x*: An accessor function for input values. By default this is the identity function, correponding to *data* as an array of numbers. If the *x* option is not function valued, it will be treated as a key to look up on entries of the input *data*.
+  * *weight*: An accessor function for weights. By default all input points are given the same weight. The weight values must sum to one. If the *weight* option is not function valued, it will be treated as a key to look up on entries of the input *data*.
+  * *bandwidth*: The kernel bandwidth (standard deviation) to use. If unspecified, the bandwidth is automatically calculated using the [nrd](#nrd) heuristic and the *adjust* option.
+  * *adjust*: A fractional value by which to scale (adjust) an automatically calculated bandwidth. For example, an *adjust* value of 0.5 will result in half the automatically-determined bandwidth. This option is ignored if the *bandwidth* option is specified.
+  * *extent*: The extent over which to compute kernel density estimation as a two-element array. Note that input data values outside the extent are ignored, potentially resulting in inaccurate densities relative to the full data. If unspecified, the *extent* is automatically calculated based on the input data extent and the *pad* option.
+  * *pad*: The amount (in kernel bandwidths) by which to extend an automatically-calculated extent. The default value is `3`, capturing 99% of the density from the most extreme points. Set this value to `0` to trim the density estimate to the minimum and maximum observed data points. This option is ignored if the *extent* option is provided.
+  * *bins*: The number of bins to use for the internal grid. The default is 512 bins. The returned density estimate will include a total of *bins* equally-spaced sample points over the *extent*.
 
 *Example*
 
 ```js
 // perform 1D estimation with bandwidth = 1 over domain [0, 10]
-// use default grid size (512) and method (kdeDeriche1d)
-// returns an array of [ { x, value }, ... ] points
-kde.density1d()
-  .bandwidth(1)
-  .extent([0, 10])
-  .points([1, 2, 5, 5, 6, 9])
+// returns an iterator over [ { x, y }, ... ] points
+kde.density1d([1, 2, 5, 5, 6, 9], { bandwidth: 1, extent: [0, 10] })
 ```
 
-<a id="_density1d" href="#_density1d">#</a>
-<i>density1d</i>(<i>data</i>)
+<a id="density1d_grid" href="#density1d_grid">#</a>
+<i>density1d</i>.<b>grid</b>()
 
-Computes a 1D Gaussian kernel density estimate using the current settings for the given *data* and returns a Float64Array of gridded density values. To instead produce an array of objects containing coordinate values and density estimates, use [density1d.points()](#density1d_points).
+Returns the internal grid array of total accumulated density values per bin. To instead produce an array of objects containing coordinate values and probability density function estimates, use [density1d.points()](#density1d_points).
 
 <a id="density1d_points" href="#density1d_points">#</a>
-<i>density1d</i>.<b>points</b>(<i>data</i>)
+<i>density1d</i>.<b>points</b>([<i>x</i>, <i>y</i>])
 
-Computes a 1D Gaussian kernel density estimate using the current settings for the given *data* and returns an array of objects containing the grid coordinate value (`x`) and density value (`value`).
+Returns an iterator over objects containing a sample point (*x*) and density value (*y*).
 
-<a id="density1d_x" href="#density1d_x">#</a>
-<i>density1d</i>.<b>x</b>([<i>x</i>])
-
-Get or set the *x* coordinate getter for the input data. Defaults to the identity function, which assumes a flat array of values.
-
-<a id="density1d_grid" href="#density1d_grid">#</a>
-<i>density1d</i>.<b>grid</b>([<i>grid</i>])
-
-Get or set the *grid* function for binning the input data into a one-dimensional grid, such as [grid1d_linear](#grid1d_linear) (the default) or [grid1d_simple](#grid1d_simple).
-
-<a id="density1d_size" href="#density1d_size">#</a>
-<i>density1d</i>.<b>size</b>([<i>size</i>])
-
-Get or set the *size* (default 512) of the binned data grid.
+* *x*: The property name for the sample point (default `"x"`).
+* *y*: The property name for the estimated density value (default `"y"`).
 
 <a id="density1d_bandwidth" href="#density1d_bandwidth">#</a>
 <i>density1d</i>.<b>bandwidth</b>([<i>bandwidth</i>])
 
-Get or set the *bandwidth* (standard deviation) of the Gaussian kernel. If set to `null` or zero (the default), the [normal reference density](#nrd) heuristic will be used to select a bandwidth automatically.
+Get or set the *bandwidth* (standard deviation) of the Gaussian kernel. Setting the *bandwidth* will update the estimator efficiently without re-performing binning. The extent will remain unchanged, even if previously determined automatically.
 
-<a id="density1d_extent" href="#density1d_extent">#</a>
-<i>density1d</i>.<b>extent</b>([<i>extent</i>])
-
-Get or set the *extent* ([x0, x1]) of the data domain over which to perform density estimation. Any data points outside this extent will be ignored. The value defaults to [0, 1]. Note that the estimation helper does _not_ automatically select a domain based on the input data.
-
-<a id="density1d_method" href="#density1d_method">#</a>
-<i>density1d</i>.<b>method</b>([<i>method</i>])
-
-Get or set the density estimation *method* to use. One of [kdeDeriche1d](#kdeDeriche1d) (the default), [kdeBox1d](#kdeBox1d), [kdeExtBox1d](#kdeExtBox1d), or [kdeCDF1d](#kdeCDF1d).
-
+### 2D Density Estimation
 
 <hr/><a id="density2d" href="#density2d">#</a>
-<i>kde</i>.<b>density2d</b>()
+<i>kde</i>.<b>density2d</b>(<i>data</i>)
 
-Creates a new 2D density estimate helper with default settings.
+Creates a new 2D density estimator for the input *data*. Returns an estimator object that includes the methods listed below, and also provides an iterator over resulting density points.
+
+* *data*: An array of input data values for which to perform density estimation.
+* *options*: Options for configuring density estimation.
+  * *x*: An accessor function for x-dimension input values. The default retrieves index `0`. If the *x* option is not function valued, it will be treated as a key to look up on entries of the input *data*.
+  * *y*: An accessor function for y-dimension input values. The default retrieves index `1`. If the *y* option is not function valued, it will be treated as a key to look up on entries of the input *data*.
+  * *weight*: An accessor function for weights. By default all input points are given the same weight. The weight values must sum to one. If the *weight* option is not function valued, it will be treated as a key to look up on entries of the input *data*.
+  * *bandwidth*: The kernel bandwidths (standard deviation) to use. If array-valued, specifies the x- and y-bandwidths separately. If number-valued, sets both x- and y-bandwidths to the same value. If unspecified, the bandwidths are automatically per-dimension calculated using the [nrd](#nrd) heuristic and the *adjust* option.
+  * *adjust*: A fractional value by which to scale (adjust) an automatically calculated bandwidth. For example, an *adjust* value of 0.5 will result in half the automatically-determined bandwidth. This option is ignored if the *bandwidth* option is specified.
+  * *extent*: The extent over which to compute kernel density estimation along both the x- and y-dimensions. If an array of arrays is provided, specified the x- and y-extents separately. If a single two-number array is provided, sets both x- and y-extents to the same value. Note that input data values outside the extent are ignored, potentially resulting in inaccurate densities relative to the full data. If unspecified, the *extent* is automatically calculated based on the input data extent and the *pad* option.
+  * *pad*: The amount (in kernel bandwidths) by which to extend an automatically-calculated extent. The default value is `3`, capturing 99% of the density from the most extreme points. Set this value to `0` to trim the density estimate to the minimum and maximum observed data points. This option is ignored if the *extent* option is provided.
+  * *bins*: The number of bins to use for the internal grid. The default is `[256, 256]` bins. If array-valued, specifies the x- and y-bins separately. If number-valued, sets both x- and y-bins to the same value. The returned density estimate will include a total of `bins[0] * bins[1]` equally-spaced sample points over the *extent*.
 
 *Example*
 
 ```js
-// perform 2D estimation with bandwidth = 1 over domain [[0, 10], [0, 10]]
-// use default grid size ([256, 256]) and method (kdeDeriche2d)
-// returns an array of [ { x, y, value }, ... ] points
-kde.density2d()
-  .bandwidth([1, 1])
-  .extent([[0, 10], [0, 10]])
-  .points([[1, 1], [1, 2], [5, 4], [5, 3], [6, 2], [8, 7]])
+// perform 2D estimation with bandwidths [1, 1] over extent [[0, 10], [0, 10]]
+// use default grid size ([256, 256])
+// returns an iterator over [ { x, y, z }, ... ] points
+const data = [[1, 1], [1, 2], [5, 4], [5, 3], [6, 2], [8, 7]];
+kde.density2d(data, { bandwidth: 1, extent: [0, 10] })
 ```
 
-<a id="_density2d" href="#_density2d">#</a>
-<i>density2d</i>(<i>data</i>)
-
-Computes a 2D Gaussian kernel density estimate for the given *data* using the current settings and returns a Float64Array of gridded density values. To instead produce an array of objects containing coordinate values and density estimates, use [density2d.points()](#density2d_points).
-
-<a id="density2d_points" href="#density2d_points">#</a>
-<i>density2d</i>.<b>points</b>(<i>data</i>)
-
-Computes a 2D Gaussian kernel density estimate for the given *data* using the current settings and returns an array of objects containing the grid coordinate (`x`, `y`) and density (`value`) values.
-
-<a id="density2d_x" href="#density2d_x">#</a>
-<i>density2d</i>.<b>x</b>([<i>x</i>])
-
-Get or set the *x* coordinate getter for the input data. Defaults to index 0 (i.e., the first element if individual data points are provided as arrays).
-
-<a id="density2d_y" href="#density2d_y">#</a>
-<i>density2d</i>.<b>y</b>([<i>y</i>])
-
-Get or set the *y* coordinate getter for the input data. Defaults to index 1 (i.e., the second element if individual data points are provided as arrays).
+```js
+// perform 2D estimation with different bandwidths and extent for x and y
+// returns an iterator over [ { x, y, z }, ... ] points
+const data = [[1, 1], [1, 2], [5, 4], [5, 3], [6, 2], [8, 7]];
+kde.density2d(data, { bandwidth: [1, 0.5], extent: [[1, 9], [1, 8]] })
+```
 
 <a id="density2d_grid" href="#density2d_grid">#</a>
-<i>density2d</i>.<b>grid</b>([<i>grid</i>])
+<i>density2d</i>.<b>grid</b>()
 
-Get or set the *grid* function for binning the input data into a two dimensional grid, such as [grid2d_linear](#grid2d_linear) (the default) or [grid2d_simple](#grid2d_simple).
+Returns the internal grid array of total accumulated density values per bin. To instead produce an array of objects containing coordinate values and probability density function estimates, use [density2d.points()](#density2d_points).
 
-<a id="density2d_size" href="#density2d_size">#</a>
-<i>density2d</i>.<b>size</b>([<i>size</i>])
+<a id="density2d_points" href="#density2d_points">#</a>
+<i>density2d</i>.<b>points</b>([<i>x</i>, <i>y</i>, <i>z</i>])
 
-Get or set the *size* (default [256, 256]) of the binned data grid.
+Returns an iterator over objects containing sample points (*x*, *y*) and density value (*z*).
+
+* *x*: The property name for the x-dimension sample point (default `"x"`).
+* *y*: The property name for the y-dimension sample point (default `"y"`).
+* *z*: The property name for the estimated density value (default `"z"`).
 
 <a id="density2d_bandwidth" href="#density2d_bandwidth">#</a>
 <i>density2d</i>.<b>bandwidth</b>([<i>bandwidth</i>])
 
-Get or set the *bandwidth*s (standard deviations) of the Gaussian kernels as a two element array. If an entry is set to `null` or zero (the defaults), the [normal reference density](#nrd) heuristic will be used to select a bandwidth automatically for that dimension.
+Get or set the *bandwidth*s (standard deviations) of the Gaussian kernel. If array-valued, specifies the x- and y-bandwidths separately. If number-valued, sets both x- and y-bandwidths to the same value. Setting the *bandwidth* will update the estimator efficiently without re-performing binning. The extent will remain unchanged, even if previously determined automatically.
 
-<a id="density2d_extent" href="#density2d_extent">#</a>
-<i>density2d</i>.<b>extent</b>([<i>extent</i>])
+<a id="density2d_heatmap" href="#density2d_heatmap">#</a>
+<i>density2d</i>.<b>heatmap</b>([<i>options</i>])
 
-Get or set the *extent*s ([[x0, x1], [y0, y1]]) of the data domain over which to perform density estimation. Any data points outside this extent will be ignored. The value defaults to [[0, 1], [0, 1]]. Note that the estimation helper does _not_ automatically select domains based on the input data.
+Generate a heatmap image of the 2D density. Returns an HTML [canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) element.
 
-<a id="density2d_method" href="#density2d_method">#</a>
-<i>density2d</i>.<b>method</b>([<i>method</i>])
-
-Get or set the density estimation *method* to use. One of [kdeDeriche2d](#kdeDeriche2d) (the default), [kdeBox2d](#kdeBox2d), [kdeExtBox2d](#kdeExtBox2d), or [kdeCDF2d](#kdeCDF2d).
-
-
-### 1D Density Estimation Methods
-
-<hr/><a id="kdeCDF1d" href="#kdeCDF1d">#</a>
-<i>kde</i>.<b>kdeCDF1d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>)
-
-Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values via direct calculation of the Gaussian cumulative distribution function. This method can be very slow in practice and is provided only for comparison and testing purposes; see [kdeDeriche1d](#kdeDeriche1d) instead. The *extent* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *size* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. Returns a Float64Array of gridded density estimates.
-
-<hr/><a id="kdeBox1d" href="#kdeBox1d">#</a>
-<i>kde</i>.<b>kdeBox1d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>, <i>grid1d</i>)
-
-Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values using the standard box filtering method. This method is not recommended for normal use, see [kdeDeriche1d](#kdeDeriche1d) instead. The *extent* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *size* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. The *grid1d* parameter indicates the binning method to use, such as [grid1d_linear](#grid1d_linear) or [grid1d_simple](#grid1d_simple). Returns a Float64Array of gridded density estimates.
-
-<hr/><a id="kdeExtBox1d" href="#kdeExtBox1d">#</a>
-<i>kde</i>.<b>kdeExtBox1d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>, <i>grid1d</i>)
-
-Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values using the extended box filtering method, which smooths away the quantization error of standard box filtering. This method is not recommended for normal use, see [kdeDeriche1d](#kdeDeriche1d) instead. The *extent* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *size* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. The *grid1d* parameter indicates the binning method to use, such as [grid1d_linear](#grid1d_linear) or [grid1d_simple](#grid1d_simple). Returns a Float64Array of gridded density estimates.
-
-<hr/><a id="kdeDeriche1D" href="#kdeDeriche1D">#</a>
-<i>kde</i>.<b>kdeDeriche1D</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>, <i>grid1d</i>)
-
-Computes a 1D Gaussian kernel density estimate for an array of numeric *data* values using Deriche's recursive filter approximation. This method is recommended for normal use. The *extent* parameter is an [x0, x1] array indicating the data domain over which to compute the estimates. Any data points lying outside this domain will be ignored. The *size* parameter indicates the number of bins (grid steps) to use. The *bandwidth* parameter indicates the width (standard deviation) of the kernel function. The *grid1d* parameter indicates the binning method to use, such as [grid1d_linear](#grid1d_linear) or [grid1d_simple](#grid1d_simple). Returns a Float64Array of gridded density estimates.
-
-### 2D Density Estimation Methods
-
-<hr/><a id="kdeCDF2d" href="#kdeCDF2d">#</a>
-<i>kde</i>.<b>kdeCDF2d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>)
-
-Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values via direct calculation of the Gaussian cumulative distribution function. This method can be very slow in practice and is provided only for comparison and testing purposes; see [kdeDeriche2d](#kdeDeriche2d) instead. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *extent* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *size* parameter should be a [sizeX, sizeY] array indicating the grid dimensions. The *bandwidth* parameter should be a [bandwidthX, bandwidthY] array. Returns a Float64Array of gridded density estimates.
-
-<hr/><a id="kdeBox2d" href="#kdeBox2d">#</a>
-<i>kde</i>.<b>kdeBox2d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>, <i>grid2d</i>)
-
-Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values using the standard box filtering method. This method is not recommended for normal use, see [kdeDeriche2d](#kdeDeriche2d) instead. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *extent* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *size* parameter should be a [sizeX, sizeY] array indicating the grid dimensions. The *bandwidth* parameter should be a [bandwidthX, bandwidthY] array. The *grid2d* parameter indicates the binning method to use, such as [grid2d_linear](#grid2d_linear) or [grid2d_simple](#grid2d_simple). Returns a Float64Array of gridded density estimates.
-
-<hr/><a id="kdeExtBox2d" href="#kdeExtBox2d">#</a>
-<i>kde</i>.<b>kdeExtBox2d</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>, <i>grid2d</i>)
-
-Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values using the extended box filtering method, which smooths away the quantization error of standard box filtering. This method is not recommended for normal use, see [kdeDeriche2d](#kdeDeriche2d) instead. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *extent* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *size* parameter should be a [sizeX, sizeY] array indicating the grid dimensions. The *bandwidth* parameter should be a [bandwidthX, bandwidthY] array. The *grid2d* parameter indicates the binning method to use, such as [grid2d_linear](#grid2d_linear) or [grid2d_simple](#grid2d_simple). Returns a Float64Array of gridded density estimates.
-
-<hr/><a id="kdeDeriche1D" href="#kdeDeriche1D">#</a>
-<i>kde</i>.<b>kdeDeriche1D</b>(<i>data</i>, <i>extent</i>, <i>size</i>, <i>bandwidth</i>, <i>grid2d</i>)
-
-Computes a 2D Gaussian kernel density estimate for two arrays of numeric *data* values using Deriche's recursive filter approximation. This method is recommended for normal use. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *extent* parameter should be an [[x0, x1], [y0, y1]] array of data domain extents. The *size* parameter should be a [sizeX, sizeY] array indicating the grid dimensions. The *bandwidth* parameters should be a [bandwidthX, bandwidthY] array. The *grid2d* parameter indicates the binning method to use, such as [grid2d_linear](#grid2d_linear) or [grid2d_simple](#grid2d_simple). Returns a Float64Array of gridded density estimates.
+* *options*: Options for heatmap image generation.
+  * *color*: A color function that maps density values (normalized to the domain [0, 1]) to either valid CSS color strings or to RGB color objects with `r`, `g`, `b` properties (in the range 0-255) and an optional `opacity` property (a fractional value between 0 and 1). If CSS color strings are used, the [d3-color](https://github.com/d3/d3-color) library must also be loaded.
+  * *clamp*: Sets the range of density values to a given [min, max] array. Values below the minimum or above the maximum will be clamped to the provided values. Values within the clamped range are then normalized to the domain [0, 1].
+  * *canvas*: A [canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) element to draw into. If unspecified, a new canvas instance is created with dimensions matching the density estimator *bins* option.
 
 ### Utility Methods
 
-Utility methods for grid construction and bandwidth suggestion.
-
-<hr/><a id="grid1d_linear" href="#grid1d_linear">#</a>
-<i>kde</i>.<b>grid1d_linear</b>(<i>data</i>, <i>size</i>, <i>init</i>, <i>scale</i>[, <i>offset</i>])
-
-Bins a set of numeric *data* values into a 1D output grid of size *size*, using linear interpolation of point mass across adjacent bins. The *init* value indicates the minimum grid value for the data domain. The *scale* parameter is a numeric value for scaling data values to a [0, 1] domain. The optional *offset* parameter (default 0) indicates the number of bins by which to offset the start of the data domain, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
-
-<hr/><a id="grid1d_simple" href="#grid1d_simple">#</a>
-<i>kde</i>.<b>grid1d_linear</b>(<i>data</i>, <i>size</i>, <i>init</i>, <i>scale</i>[, <i>offset</i>])
-
-Bins a set of numeric *data* values into a 1D output grid of size *size*, where the full weight of a point is assigned to the nearest enclosing bin. The *init* value indicates the minimum grid value for the data domain. The *scale* parameter is a numeric value for scaling data values to a [0, 1] domain. The optional *offset* parameter (default 0) indicates the number of bins by which to offset the start of the data domain, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
-
-<hr/><a id="grid2d_linear" href="#grid2d_linear">#</a>
-<i>kde</i>.<b>grid2d_linear</b>(<i>data</i>, <i>size</i>, <i>init</i>, <i>scale</i>, <i>offset</i>)
-
-Bins a set of numeric *data* values into a 2D output grid of size *size*, using linear interpolation of point mass across adjacent bins. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *size* parameter sets the grid dimensions and should be an [sizeX, sizeY] array containing two integers. The *init* parameter ([initX, initY]) indicates the minimum grid values for the data domains. The *scale* parameter ([scaleX, scaleY]) provides numeric values for scaling data values to a [0, 1] domain. The *offset* parameter ([offsetX, offsetY]) indicates the number of bins by which to offset the start of the data domains, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
-
-<hr/><a id="grid2d_simple" href="#grid2d_simple">#</a>
-<i>kde</i>.<b>grid2d_simple</b>(<i>data</i>, <i>size</i>, <i>init</i>, <i>scale</i>, <i>offset</i>)
-
-Bins a set of numeric *data* values into a 2D output grid  of size *size*, where the full weight of a point is assigned to the nearest enclosing bin. The input *data* should be an array with two entries: a numeric x-value array and a numeric y-value array. The *size* parameter sets the grid dimensions and should be an [sizeX, sizeY] array containing two integers. The *init* parameter ([initX, initY]) indicates the minimum grid values for the data domains. The *scale* parameter ([scaleX, scaleY]) provides numeric values for scaling data values to a [0, 1] domain. The *offset* parameter ([offsetX, offsetY]) indicates the number of bins by which to offset the start of the data domains, in the case of padded grids with extra spacing. Returns a Float64Array of gridded values.
-
 <hr/><a id="nrd" href="#nrd">#</a>
-<i>kde</i>.<b>nrd</b>(<i>data</i>)
+<i>kde</i>.<b>nrd</b>(<i>data</i>, <i>accessor</i>)
 
-Calculates a suggested bandwidth for an array of numeric *data* values, using Scott's normal reference distribution (NRD) heuristic.
+Calculates a suggested bandwidth for a set of numeric *data* values, using Scott's normal reference distribution (NRD) heuristic.
+
+<hr/><a id="opacityMap" href="#opacityMap">#</a>
+<i>kde</i>.<b>opacityMap</b>(<i>r</i>, <i>g</i>, <i>b</i>)
+
+Returns a color map function (compatible with the [heatmap](#density2d_heatmap) *color* option) that ramps the opacity for a fixed set of *r*, *g*, *b* values in the range 0-255.
