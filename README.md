@@ -1,6 +1,6 @@
 # Fast Gaussian Kernel Density Estimation
 
-Fast Gaussian kernel density estimation in 1D or 2D. Provides accurate, linear-time O(N + K) estimation using Deriche's approximation. This package is based on the IEEE VIS 2021 Short Paper [Fast & Accurate Gaussian Kernel Density Estimation](https://idl.cs.washington.edu/papers/fast-kde).
+Fast Gaussian kernel density estimation in 1D or 2D. Provides accurate, linear-time O(N + K) estimation using Deriche's approximation. This package is based on the IEEE VIS 2021 Short Paper [Fast & Accurate Gaussian Kernel Density Estimation](https://idl.cs.washington.edu/papers/fast-kde). _(For the benchmarks in that paper, see [github.com/uwdata/fast-kde-benchmarks](uwdata/fast-kde-benchmarks).)_
 
 ## Citation
 
@@ -18,7 +18,7 @@ If you use or build on this package in academic work, please use this citation:
 
 ## Usage Examples
 
-For interactive examples, see our [Fast KDE Observable notebook](https://observablehq.com/@uwdata/fast-gaussian-kde).
+For interactive examples, see our [Fast KDE Observable notebook](https://observablehq.com/@uwdata/fast-kde).
 
 ### 1D Density Estimation
 
@@ -112,7 +112,7 @@ Compiled bundles will be written to the `dist` directory.
 
 ### 1D Density Estimation
 
-<hr/><a id="density1d" href="#density1d">#</a>
+<a id="density1d" href="#density1d">#</a>
 <i>kde</i>.<b>density1d</b>(<i>data</i>[, <i>options</i>])
 
 Creates a new 1D density estimator for the input *data*. Returns an estimator object that includes the methods listed below, and also provides an iterator over resulting density points.
@@ -153,9 +153,11 @@ Returns an iterator over objects containing a sample point (*x*) and density val
 
 Get or set the *bandwidth* (standard deviation) of the Gaussian kernel. Setting the *bandwidth* will update the estimator efficiently without re-performing binning. The extent will remain unchanged, even if previously determined automatically.
 
+<hr/>
+
 ### 2D Density Estimation
 
-<hr/><a id="density2d" href="#density2d">#</a>
+<a id="density2d" href="#density2d">#</a>
 <i>kde</i>.<b>density2d</b>(<i>data</i>)
 
 Creates a new 2D density estimator for the input *data*. Returns an estimator object that includes the methods listed below, and also provides an iterator over resulting density points.
@@ -217,14 +219,16 @@ Generate a heatmap image of the 2D density. Returns an HTML [canvas](https://dev
   * *clamp*: Sets the range of density values to a given [min, max] array. Values below the minimum or above the maximum will be clamped to the provided values. Values within the clamped range are then normalized to the domain [0, 1].
   * *canvas*: A [canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) element to draw into. If unspecified, a new canvas instance is created with dimensions matching the density estimator *bins* option.
 
+<hr/>
+
 ### Utility Methods
 
-<hr/><a id="nrd" href="#nrd">#</a>
+<a id="nrd" href="#nrd">#</a>
 <i>kde</i>.<b>nrd</b>(<i>data</i>, <i>accessor</i>)
 
 Calculates a suggested bandwidth for a set of numeric *data* values, using Scott's normal reference distribution (NRD) heuristic.
 
-<hr/><a id="opacityMap" href="#opacityMap">#</a>
+<a id="opacityMap" href="#opacityMap">#</a>
 <i>kde</i>.<b>opacityMap</b>(<i>r</i>, <i>g</i>, <i>b</i>)
 
 Returns a color map function (compatible with the [heatmap](#density2d_heatmap) *color* option) that ramps the opacity for a fixed set of *r*, *g*, *b* values in the range 0-255.
