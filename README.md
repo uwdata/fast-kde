@@ -1,6 +1,8 @@
 # Fast Gaussian Kernel Density Estimation
 
-Fast Gaussian kernel density estimation in 1D or 2D. Provides accurate, linear-time O(N + K) estimation using Deriche's approximation. This package is based on the IEEE VIS 2021 Short Paper [Fast & Accurate Gaussian Kernel Density Estimation](https://idl.cs.washington.edu/papers/fast-kde). _(For the benchmarks in that paper, see [github.com/uwdata/fast-kde-benchmarks](uwdata/fast-kde-benchmarks).)_
+Fast Gaussian kernel density estimation in 1D or 2D.
+
+This package provides accurate, linear-time O(N + K) estimation using Deriche's approximation and is based on the IEEE VIS 2021 Short Paper [Fast & Accurate Gaussian Kernel Density Estimation](https://idl.cs.washington.edu/papers/fast-kde). _(For the benchmarks in that paper, see [github.com/uwdata/fast-kde-benchmarks](uwdata/fast-kde-benchmarks).)_
 
 ## Citation
 
