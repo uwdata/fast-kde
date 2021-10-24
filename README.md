@@ -121,8 +121,8 @@ Creates a new 1D density estimator for the input *data*. Returns an estimator ob
 
 * *data*: An array of input data values for which to perform density estimation. The array values may be numbers or objects.
 * *options*: Options for configuring density estimation.
-  * *x*: An accessor function for input values. By default this is the identity function, correponding to *data* as an array of numbers. If the *x* option is not function valued, it will be treated as a key to look up on entries of the input *data*.
-  * *weight*: An accessor function for weights. By default all input points are given the same weight. The weight values must sum to one. If the *weight* option is not function valued, it will be treated as a key to look up on entries of the input *data*.
+  * *x*: An accessor function for input values. By default this is the identity function, corresponding to *data* as an array of numbers. If the *x* option is not function-valued, it will be treated as a key to look up on entries of the input *data*.
+  * *weight*: An accessor function for weights. By default all input points are given the same weight. The weight values must sum to one. If the *weight* option is not function-valued, it will be treated as a key to look up on entries of the input *data*.
   * *bandwidth*: The kernel bandwidth (standard deviation) to use. If unspecified, the bandwidth is automatically calculated using the [nrd](#nrd) heuristic and the *adjust* option.
   * *adjust*: A fractional value by which to scale (adjust) an automatically calculated bandwidth. For example, an *adjust* value of 0.5 will result in half the automatically-determined bandwidth. This option is ignored if the *bandwidth* option is specified.
   * *extent*: The extent over which to compute kernel density estimation as a two-element array. Note that input data values outside the extent are ignored, potentially resulting in inaccurate densities relative to the full data. If unspecified, the *extent* is automatically calculated based on the input data extent and the *pad* option.
@@ -160,18 +160,18 @@ Get or set the *bandwidth* (standard deviation) of the Gaussian kernel. Setting 
 ### 2D Density Estimation
 
 <a id="density2d" href="#density2d">#</a>
-<i>kde</i>.<b>density2d</b>(<i>data</i>)
+<i>kde</i>.<b>density2d</b>(<i>data</i>[, <i>options</i>])
 
 Creates a new 2D density estimator for the input *data*. Returns an estimator object that includes the methods listed below, and also provides an iterator over resulting density points.
 
 * *data*: An array of input data values for which to perform density estimation.
 * *options*: Options for configuring density estimation.
-  * *x*: An accessor function for x-dimension input values. The default retrieves index `0`. If the *x* option is not function valued, it will be treated as a key to look up on entries of the input *data*.
-  * *y*: An accessor function for y-dimension input values. The default retrieves index `1`. If the *y* option is not function valued, it will be treated as a key to look up on entries of the input *data*.
-  * *weight*: An accessor function for weights. By default all input points are given the same weight. The weight values must sum to one. If the *weight* option is not function valued, it will be treated as a key to look up on entries of the input *data*.
-  * *bandwidth*: The kernel bandwidths (standard deviation) to use. If array-valued, specifies the x- and y-bandwidths separately. If number-valued, sets both x- and y-bandwidths to the same value. If unspecified, the bandwidths are automatically per-dimension calculated using the [nrd](#nrd) heuristic and the *adjust* option.
+  * *x*: An accessor function for x-dimension input values. The default accessor retrieves index `0`. If the *x* option is not function-valued, it will be treated as a key to look up on entries of the input *data*.
+  * *y*: An accessor function for y-dimension input values. The default accessor retrieves index `1`. If the *y* option is not function-valued, it will be treated as a key to look up on entries of the input *data*.
+  * *weight*: An accessor function for weights. By default all input points are given the same weight. The weight values should sum to one for the output to be a proper probability density estimate. If the *weight* option is not function-valued, it will be treated as a key to look up on entries of the input *data*.
+  * *bandwidth*: The kernel bandwidths (standard deviations) to use. If array-valued, specifies the x- and y-bandwidths separately. If number-valued, sets both the x- and y-bandwidths to the same value. If unspecified, the bandwidths are automatically calculated per-dimension using the [nrd](#nrd) heuristic and the *adjust* option.
   * *adjust*: A fractional value by which to scale (adjust) an automatically calculated bandwidth. For example, an *adjust* value of 0.5 will result in half the automatically-determined bandwidth. This option is ignored if the *bandwidth* option is specified.
-  * *extent*: The extent over which to compute kernel density estimation along both the x- and y-dimensions. If an array of arrays is provided, specified the x- and y-extents separately. If a single two-number array is provided, sets both x- and y-extents to the same value. Note that input data values outside the extent are ignored, potentially resulting in inaccurate densities relative to the full data. If unspecified, the *extent* is automatically calculated based on the input data extent and the *pad* option.
+  * *extent*: The extent over which to compute kernel density estimation along both the x- and y-dimensions. If an array of arrays is provided, specifies the x- and y-extents separately. If a single two-number array is provided, sets both x- and y-extents to the same value. Note that input data values outside the extent are ignored, potentially resulting in inaccurate densities relative to the full data. If unspecified, the *extent* is automatically calculated based on the input data extent and the *pad* option.
   * *pad*: The amount (in kernel bandwidths) by which to extend an automatically-calculated extent. The default value is `3`, capturing 99% of the density from the most extreme points. Set this value to `0` to trim the density estimate to the minimum and maximum observed data points. This option is ignored if the *extent* option is provided.
   * *bins*: The number of bins to use for the internal grid. The default is `[256, 256]` bins. If array-valued, specifies the x- and y-bins separately. If number-valued, sets both x- and y-bins to the same value. The returned density estimate will include a total of `bins[0] * bins[1]` equally-spaced sample points over the *extent*.
 
