@@ -3,7 +3,7 @@
 // https://www.ipol.im/pub/art/2013/87/gaussian_20131215.tgz
 // http://dev.ipol.im/~getreuer/code/doc/gaussian_20131215_doc/gaussian__conv__deriche_8c.html
 
-export function dericheConfig(sigma) {
+export function dericheConfig(sigma, negative = false) {
   // compute causal filter coefficients
   const a = new Float64Array(5);
   const bc = new Float64Array(4);
@@ -26,8 +26,7 @@ export function dericheConfig(sigma) {
   // coefficients object
   return {
     sigma,
-    K: 4,
-    max_iter: Math.ceil(10 * sigma),
+    negative,
     a,
     b_causal: bc,
     b_anticausal: ba,
@@ -59,14 +58,14 @@ function dericheCausalCoeff(a_out, b_out, sigma) {
 
   const denom = sigma * 2.5066282746310007;
 
-  // Initialize b/a = alpha[0] / (1 + beta[0] z^-1)
+  // initialize b/a = alpha[0] / (1 + beta[0] z^-1)
   const b = Float64Array.of(alpha[0], alpha[1], 0, 0, 0, 0, 0, 0);
   const a = Float64Array.of(1, 0, beta[0], beta[1], 0, 0, 0, 0, 0, 0);
 
   let j, k;
 
   for (k = 2; k < 8; k += 2) {
-    // Add kth term, b/a += alpha[k] / (1 + beta[k] z^-1)
+    // dd kth term, b/a += alpha[k] / (1 + beta[k] z^-1)
     b[k]     = beta[k] * b[k - 2] - beta[k + 1] * b[k - 1];
     b[k + 1] = beta[k] * b[k - 1] + beta[k + 1] * b[k - 2];
     for (j = k - 2; j > 0; j -= 2) {
@@ -130,18 +129,17 @@ export function dericheConv1d(
   const stride_N = stride * N;
   let i, n;
 
-  // Initialize causal filter on the left boundary.
+  // initialize causal filter on the left boundary
   init(
     y_causal, src, N, stride,
     c.b_causal, 3, c.a, 4, c.sum_causal, h, c.sigma
   );
 
-  // The following filters the interior samples according to the filter
-  // order 4. The loop below implements the pseudocode
-  // For n = K, ..., N - 1,
+  // filter the interior samples using a 4th order filter. Implements:
+  // for n = K, ..., N - 1,
   //   y^+(n) = \sum_{k=0}^{K-1} b^+_k src(n - k)
   //          - \sum_{k=1}^K a_k y^+(n - k)
-  // Variable i tracks the offset to the nth sample of src, it is
+  // variable i tracks the offset to the nth sample of src, it is
   // updated together with n such that i = stride * n.
   for (n = 4, i = stride_4; n < N; ++n, i += stride) {
     y_causal[n] = c.b_causal[0] * src[i]
@@ -154,18 +152,17 @@ export function dericheConv1d(
       - c.a[4] * y_causal[n - 4];
   }
 
-  // Initialize anticausal filter on the right boundary.
+  // initialize the anticausal filter on the right boundary
   init(
     y_anticausal, src, N, -stride,
     c.b_anticausal, 4, c.a, 4, c.sum_anticausal, h, c.sigma
   );
 
-  // Similar to the causal filter code above, the following implements
-  // the pseudocode
-  // For n = K, ..., N - 1,
+  // similar to the causal filter above, the following implements:
+  // for n = K, ..., N - 1,
   //   y^-(n) = \sum_{k=1}^K b^-_k src(N - n - 1 - k)
   //          - \sum_{k=1}^K a_k y^-(n - k)
-  // Variable i is updated such that i = stride * (N - n - 1).
+  // variable i is updated such that i = stride * (N - n - 1).
   for (n = 4, i = stride_N - stride * 5; n < N; ++n, i -= stride) {
     y_anticausal[n] = c.b_anticausal[1] * src[i + stride]
       + c.b_anticausal[2] * src[i + stride_2]
@@ -177,9 +174,17 @@ export function dericheConv1d(
       - c.a[4] * y_anticausal[n - 4];
   }
 
-  // Sum the causal and anticausal responses to obtain the final result.
-  for (n = 0, i = 0; n < N; ++n, i += stride) {
-    d[i] = Math.max(0, y_causal[n] + y_anticausal[N - n - 1]);
+  // sum the causal and anticausal responses to obtain the final result
+  if (c.negative) {
+    // do not threshold if the input grid includes negatively weighted values
+    for (n = 0, i = 0; n < N; ++n, i += stride) {
+      d[i] = y_causal[n] + y_anticausal[N - n - 1];
+    }
+  } else {
+    // threshold to prevent small negative values due to floating point error
+    for (n = 0, i = 0; n < N; ++n, i += stride) {
+      d[i] = Math.max(0, y_causal[n] + y_anticausal[N - n - 1]);
+    }
   }
 
   return d;
@@ -190,7 +195,7 @@ export function dericheInitZeroPad(dest, src, N, stride, b, p, a, q, sum, h) {
   const off = stride < 0 ? stride_N + stride : 0;
   let i, n, m;
 
-  // Compute the first q taps of the impulse response, h_0, ..., h_{q-1}
+  // compute the first q taps of the impulse response, h_0, ..., h_{q-1}
   for (n = 0; n < q; ++n) {
     h[n] = (n <= p) ? b[n] : 0;
     for (m = 1; m <= q && m <= n; ++m) {
@@ -198,8 +203,8 @@ export function dericheInitZeroPad(dest, src, N, stride, b, p, a, q, sum, h) {
     }
   }
 
-  // Compute dest_m = sum_{n=1}^m h_{m-n} src_n, m = 0, ..., q-1
-  // Note: q == 4
+  // compute dest_m = sum_{n=1}^m h_{m-n} src_n, m = 0, ..., q-1
+  // note: q == 4
   for (m = 0; m < q; ++m) {
     for (dest[m] = 0, n = 1; n <= m; ++n) {
       i = off + stride * n;

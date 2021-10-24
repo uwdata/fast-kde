@@ -6,13 +6,14 @@ export function heatmap(
   h,
   color = opacityMap(0, 0, 0),
   [lo, hi] = [0, max(grid)],
-  canvas = createCanvas(w, h)
+  canvas = createCanvas(w, h),
+  paletteSize = 256
 ) {
   const norm = 1 / (hi - lo);
   const ctx = canvas.getContext('2d');
   const img = ctx.getImageData(0, 0, w, h);
   const pix = img.data;
-  const size = 255;
+  const size = paletteSize - 1;
   const palette = buildPalette(size, color);
 
   for (let j = 0, k = 0; j < h; ++j) {

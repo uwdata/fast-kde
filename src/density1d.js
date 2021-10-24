@@ -14,8 +14,9 @@ export function density1d(data, options = {}) {
   const [lo, hi] = options.extent ?? densityExtent(data, x, pad * bandwidth);
   const grid = bin1d(data, x, w, lo, hi, bins);
   const delta = (hi - lo) / (bins - 1);
+  const neg = grid.some(v => v < 0);
 
-  let config = dericheConfig(bandwidth / delta);
+  let config = dericheConfig(bandwidth / delta, neg);
   let result;
 
   function* points(x = 'x', y = 'y') {
@@ -33,12 +34,13 @@ export function density1d(data, options = {}) {
     [Symbol.iterator]: points,
     points,
     grid: () => result || (result = dericheConv1d(config, grid, bins)),
+    extent: () => [lo, hi],
     bandwidth(_) {
       if (arguments.length) {
         if (_ !== bandwidth) {
           bandwidth = _;
           result = null;
-          config = dericheConfig(bandwidth / delta);
+          config = dericheConfig(bandwidth / delta, neg);
         }
         return estimator;
       } else {
