@@ -26,9 +26,10 @@ export function density2d(data, options = {}) {
   const grid = bin2d(data, x, y, w, x0, x1, binsX, y0, y1, binsY);
   const deltaX = (x1 - x0) / (binsX - 1);
   const deltaY = (y1 - y0) / (binsY - 1);
+  const neg = grid.some(v => v < 0);
 
-  let configX = dericheConfig(bwX / deltaX);
-  let configY = dericheConfig(bwY / deltaY);
+  let configX = dericheConfig(bwX / deltaX, neg);
+  let configY = dericheConfig(bwY / deltaY, neg);
   let result;
 
   function* points(x = 'x', y = 'y', z = 'z') {
@@ -49,17 +50,19 @@ export function density2d(data, options = {}) {
     [Symbol.iterator]: points,
     points,
     grid: () => result || (result = dericheConv2d(configX, configY, grid, [binsX, binsY])),
-    heatmap: ({ color, clamp, canvas } = {}) => heatmap(estimator.grid(), binsX, binsY, color, clamp, canvas),
+    extent: () => [ [x0, x1], [y0, y1] ],
+    heatmap: ({ color, clamp, canvas, maxColors } = {}) =>
+      heatmap(estimator.grid(), binsX, binsY, color, clamp, canvas, maxColors),
     bandwidth(_) {
       if (arguments.length) {
         const [_0, _1] = number2(_);
         if (_0 !== bwX) {
           result = null;
-          configX = dericheConfig((bwX = _0) / deltaX);
+          configX = dericheConfig((bwX = _0) / deltaX, neg);
         }
         if (_1 !== bwY) {
           result = null;
-          configY = dericheConfig((bwY = _1) / deltaY);
+          configY = dericheConfig((bwY = _1) / deltaY, neg);
         }
         return estimator;
       } else {
