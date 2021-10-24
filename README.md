@@ -155,6 +155,11 @@ Returns an iterator over objects containing a sample point (*x*) and density val
 
 Get or set the *bandwidth* (standard deviation) of the Gaussian kernel. Setting the *bandwidth* will update the estimator efficiently without re-performing binning. The extent will remain unchanged, even if previously determined automatically.
 
+<a id="density1d_extent" href="#density1d_extent">#</a>
+<i>density1d</i>.<b>extent</b>()
+
+Get the calculated extent of density estimation as a [min, max] extent array. This method does not support setting the extent to a new value, as this requires re-binning the input data.
+
 <hr/>
 
 ### 2D Density Estimation
@@ -211,6 +216,11 @@ Returns an iterator over objects containing sample points (*x*, *y*) and density
 
 Get or set the *bandwidth*s (standard deviations) of the Gaussian kernel. If array-valued, specifies the x- and y-bandwidths separately. If number-valued, sets both x- and y-bandwidths to the same value. Setting the *bandwidth* will update the estimator efficiently without re-performing binning. The extent will remain unchanged, even if previously determined automatically.
 
+<a id="density2d_extent" href="#density2d_extent">#</a>
+<i>density2d</i>.<b>extent</b>()
+
+Get the calculated extent of density estimation. Returns an array containing the x- and y-dimension [min, max] extents. This method does not support setting the extent to a new value, as this requires re-binning the input data.
+
 <a id="density2d_heatmap" href="#density2d_heatmap">#</a>
 <i>density2d</i>.<b>heatmap</b>([<i>options</i>])
 
@@ -220,6 +230,7 @@ Generate a heatmap image of the 2D density. Returns an HTML [canvas](https://dev
   * *color*: A color function that maps density values (normalized to the domain [0, 1]) to either valid CSS color strings or to RGB color objects with `r`, `g`, `b` properties (in the range 0-255) and an optional `opacity` property (a fractional value between 0 and 1). If CSS color strings are used, the [d3-color](https://github.com/d3/d3-color) library must also be loaded.
   * *clamp*: Sets the range of density values to a given [min, max] array. Values below the minimum or above the maximum will be clamped to the provided values. Values within the clamped range are then normalized to the domain [0, 1].
   * *canvas*: A [canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) element to draw into. If unspecified, a new canvas instance is created with dimensions matching the density estimator *bins* option.
+  * *maxColors*: The maximum number of colors (default 256) to use for heatmap generation. This number determines the size of the backing pre-computed palette, and thus the number of times the *color* function is invoked.
 
 <hr/>
 
