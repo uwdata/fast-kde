@@ -6,14 +6,18 @@ export function bin2d(data, x, y, w, x0, x1, xn, y0, y1, yn) {
   for (let i = 0; i < data.length; ++i) {
     const d = data[i];
     const xi = (x(d, i, data) - x0) * xdelta;
+    const yi = (y(d, i, data) - y0) * ydelta;
+    const wi = w(d, i, data);
+
+    // skip NaN and Infinite values
+    if (!(Number.isFinite(xi) && Number.isFinite(yi) && Number.isFinite(wi))) {
+      continue;
+    }
+
     const xu = Math.floor(xi);
     const xv = xu + 1;
-
-    const yi = (y(d, i, data) - y0) * ydelta;
     const yu = Math.floor(yi);
     const yv = yu + 1;
-
-    const wi = w(d, i, data);
 
     if (0 <= xu && xv < xn) {
       if (0 <= yu && yv < yn) {
