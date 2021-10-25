@@ -219,7 +219,7 @@ Get or set the *bandwidth*s (standard deviations) of the Gaussian kernel. If arr
 <a id="density2d_extent" href="#density2d_extent">#</a>
 <i>density2d</i>.<b>extent</b>()
 
-Get the calculated extent of density estimation. Returns an array containing the x- and y-dimension [min, max] extents. This method does not support setting the extent to a new value, as this requires re-binning the input data.
+Get the calculated extent of density estimation. Returns an array containing the x- and y-dimension extents: [[xmin, xmax], [ymin, ymax]]. This method does not support setting the extent to a new value, as this requires re-binning the input data.
 
 <a id="density2d_heatmap" href="#density2d_heatmap">#</a>
 <i>density2d</i>.<b>heatmap</b>([<i>options</i>])
