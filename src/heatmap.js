@@ -5,7 +5,7 @@ export function heatmap(
   w,
   h,
   color = opacityMap(0, 0, 0),
-  [lo, hi] = [0, max(grid)],
+  [lo, hi] = [Math.min(0, min(grid)), Math.max(0, max(grid))],
   canvas = createCanvas(w, h),
   paletteSize = 256
 ) {
@@ -61,6 +61,15 @@ function max(array) {
   let v = -Infinity;
   for (let i = 0; i < n; ++i) {
     if (array[i] > v) v = array[i];
+  }
+  return v;
+}
+
+function min(array) {
+  const n = array.length;
+  let v = +Infinity;
+  for (let i = 0; i < n; ++i) {
+    if (array[i] < v) v = array[i];
   }
   return v;
 }
