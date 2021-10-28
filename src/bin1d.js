@@ -4,24 +4,25 @@ export function bin1d(data, x, weight, lo, hi, n) {
 
   for (let i = 0; i < data.length; ++i) {
     const d = data[i];
-    const p = (x(d, i, data) - lo) * delta;
-    const w = weight(d, i, data);
+    const xi = x(d, i, data);
+    const wi = weight(d, i, data);
 
     // skip NaN and Infinite values
-    if (!(Number.isFinite(p) && Number.isFinite(w))) {
+    if (!(Number.isFinite(xi) && Number.isFinite(wi))) {
       continue;
     }
 
+    const p = (xi - lo) * delta;
     const u = Math.floor(p);
     const v = u + 1;
 
     if (0 <= u && v < n) {
-      grid[u] += (v - p) * w;
-      grid[v] += (p - u) * w;
+      grid[u] += (v - p) * wi;
+      grid[v] += (p - u) * wi;
     } else if (u === -1) {
-      grid[v] += (p - u) * w;
+      grid[v] += (p - u) * wi;
     } else if (v === n) {
-      grid[u] += (v - p) * w;
+      grid[u] += (v - p) * wi;
     }
   }
 
