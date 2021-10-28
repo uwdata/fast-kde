@@ -65,7 +65,7 @@ function dericheCausalCoeff(a_out, b_out, sigma) {
   let j, k;
 
   for (k = 2; k < 8; k += 2) {
-    // dd kth term, b/a += alpha[k] / (1 + beta[k] z^-1)
+    // add kth term, b/a += alpha[k] / (1 + beta[k] z^-1)
     b[k]     = beta[k] * b[k - 2] - beta[k + 1] * b[k - 1];
     b[k + 1] = beta[k] * b[k - 1] + beta[k + 1] * b[k - 2];
     for (j = k - 2; j > 0; j -= 2) {
