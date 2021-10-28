@@ -5,7 +5,7 @@ export function heatmap(
   w,
   h,
   color = opacityMap(0, 0, 0),
-  [lo, hi] = [Math.min(0, min(grid)), Math.max(0, max(grid))],
+  [lo, hi] = [min(grid, 0), max(grid, 0)],
   canvas = createCanvas(w, h),
   paletteSize = 256
 ) {
@@ -56,18 +56,16 @@ function createCanvas(w, h) {
   throw 'Can not create a canvas instance, provide a canvas as a parameter.';
 }
 
-function max(array) {
+function max(array, v) {
   const n = array.length;
-  let v = -Infinity;
   for (let i = 0; i < n; ++i) {
     if (array[i] > v) v = array[i];
   }
   return v;
 }
 
-function min(array) {
+function min(array, v) {
   const n = array.length;
-  let v = +Infinity;
   for (let i = 0; i < n; ++i) {
     if (array[i] < v) v = array[i];
   }
