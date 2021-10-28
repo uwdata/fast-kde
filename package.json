@@ -1,7 +1,7 @@
 {
   "name": "fast-kde",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "keywords": [
     "kernel density estimation",
     "kde",
@@ -30,7 +30,7 @@
     "eslint": "^8.1.0",
     "mocha": "^9.1.3",
     "rimraf": "^3.0.2",
-    "rollup": "^2.58.0",
+    "rollup": "^2.58.3",
     "rollup-plugin-bundle-size": "^1.0.3",
     "rollup-plugin-terser": "^7.0.2"
   }
